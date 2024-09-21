@@ -5,12 +5,10 @@ import java.util.Properties;
  * This Java class contains attributes and methods related to Passenger
  * @author Alysha Thean Student ID: 1495768
  */
-public class Passenger {
+public class Passenger extends GameEntity implements Damageable{
 
     public final static int MOVE_FRAME = 5;
-
-    public final Properties GAME_PROPS;
-    public final Image IMAGE;
+    
     public final TripEndFlag TRIP_END_FLAG;
     public final int ADJACENT_DIST;
     public final int WALK_SPEED_X;
@@ -20,14 +18,27 @@ public class Passenger {
     public final int RATE_PRIORITY_2;
     public final int RATE_PRIORITY_3;
 
-    private int coorX;
-    private int coorY;
     private int priority;
     private int endCoorX;
     private int yDist;
     private double earnings;
     private boolean isPickedUp;
     private boolean isDroppedOff;
+
+    //
+    public final static int EJECTION_COOR_X_MINUS = 100;
+    public static final int MOMENTUM = 10;
+    public final static int MOMENTUM_COOR_Y_MINUS = 2;
+    public final static int COLLISION_TIMEOUT = 200;
+
+
+    public final int RADIUS;
+    public final int TAXI_GET_IN_RADIUS;
+
+    private int health;
+    private boolean hasUmbrella;
+    private Blood blood;
+    private boolean isEjected;
 
     /**
      * Constructor for Passenger class
@@ -38,20 +49,19 @@ public class Passenger {
      * @param endCoorX integer of passenger end x-coordinate
      * @param yDist integer of distance travelled vertically during trip
      */
-    public Passenger(Properties gameProps, int coorX, int coorY, int priority, int endCoorX, int yDist){
-        this.GAME_PROPS = gameProps;
+    public Passenger(Properties gameProps, int coorX, int coorY, int priority, int endCoorX, int yDist,
+                     boolean hasUmbrella){
+        super(gameProps, coorX, coorY);
         this.IMAGE = new Image(gameProps.getProperty("gameObjects.passenger.image"));
         this.TRIP_END_FLAG = new TripEndFlag(gameProps, endCoorX, coorY - yDist);
-        this.ADJACENT_DIST = Integer.parseInt(GAME_PROPS.getProperty("gameObjects.passenger.taxiDetectRadius"));
-        this.WALK_SPEED_X = Integer.parseInt(GAME_PROPS.getProperty("gameObjects.passenger.walkSpeedX"));
-        this.WALK_SPEED_Y = Integer.parseInt(GAME_PROPS.getProperty("gameObjects.passenger.walkSpeedY"));
+        this.ADJACENT_DIST = Integer.parseInt(gameProps.getProperty("gameObjects.passenger.taxiDetectRadius"));
+        this.WALK_SPEED_X = Integer.parseInt(gameProps.getProperty("gameObjects.passenger.walkSpeedX"));
+        this.WALK_SPEED_Y = Integer.parseInt(gameProps.getProperty("gameObjects.passenger.walkSpeedY"));
         this.RATE_PER_Y = Double.parseDouble(gameProps.getProperty("trip.rate.perY"));
         this.RATE_PRIORITY_1 = Integer.parseInt(gameProps.getProperty("trip.rate.priority1"));
         this.RATE_PRIORITY_2 = Integer.parseInt(gameProps.getProperty("trip.rate.priority2"));
         this.RATE_PRIORITY_3 = Integer.parseInt(gameProps.getProperty("trip.rate.priority3"));
 
-        this.coorX = coorX;
-        this.coorY = coorY;
         this.priority = priority;
         this.endCoorX = endCoorX;
         this.yDist = yDist;
@@ -59,38 +69,13 @@ public class Passenger {
         this.isPickedUp = false;
         this.isDroppedOff = false;
 
-    }
+        //
+        this.isEjected = false;
 
-    /**
-     * Getter method for passenger's x-coordinate
-     * @return integer of passenger's x-coordinate
-     */
-    public int getCoorX() {
-        return coorX;
-    }
+        this.RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.passenger.radius"));
+        this.TAXI_GET_IN_RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.passenger.taxiGetInRadius"));
+        this.health = (int) (Double.parseDouble(gameProps.getProperty("gameObjects.passenger.health")) * 100);
 
-    /**
-     * Setter method for passenger's x-coordinate
-     * @param coorX integer of passenger's new x-coordinate
-     */
-    public void setCoorX(int coorX) {
-        this.coorX = coorX;
-    }
-
-    /**
-     * Getter method for passenger's y-coordinate
-     * @return integer of passenger's y-coordinate
-     */
-    public int getCoorY() {
-        return coorY;
-    }
-
-    /**
-     * Setter method for passenger's y-coordinate
-     * @param coorY integer of passenger's new y-coordinate
-     */
-    public void setCoorY(int coorY) {
-        this.coorY = coorY;
     }
 
     /**
@@ -174,10 +159,26 @@ public class Passenger {
     }
 
     /**
+     * Getter method of whether passenger has umbrella
+     * @return boolean of whether passenger has umbrella
+     */
+    public boolean getHasUmbrella() {
+        return hasUmbrella;
+    }
+
+    /**
+     * Setter method of whether passenger has umbrella
+     * @param hasUmbrella boolean of whether passenger has umbrella
+     */
+    public void setHasUmbrella(boolean hasUmbrella) {
+        this.hasUmbrella = hasUmbrella;
+    }
+
+    /**
      * Moves passenger and passenger's trip end flag by incrementing its y-coordinates based on MOVE_FRAME
      */
     public void moveDown(){
-        coorY += MOVE_FRAME;
+        setCoorY(getCoorY() + MOVE_FRAME);
         TRIP_END_FLAG.moveDown();
     }
 
@@ -189,7 +190,7 @@ public class Passenger {
      */
     public boolean isAdjacent(double targetCoorX, double targetCoorY){
         boolean flag = false;
-        double dist = Math.sqrt(Math.pow((coorX - targetCoorX), 2) + Math.pow((coorY - targetCoorY), 2));
+        double dist = Math.sqrt(Math.pow((getCoorX() - targetCoorX), 2) + Math.pow((getCoorY() - targetCoorY), 2));
         if (dist <= ADJACENT_DIST){
             flag = true;
         }
@@ -208,17 +209,17 @@ public class Passenger {
             return;
         }
 
-        if (coorX < targetCoorX){
-            coorX += WALK_SPEED_X;
+        if (getCoorX() < targetCoorX){
+            setCoorX(getCoorX()+ WALK_SPEED_X);
 
-        } else if (coorX > targetCoorX){
-            coorX -= WALK_SPEED_X;
+        } else if (getCoorX() > targetCoorX){
+            setCoorX(getCoorX() - WALK_SPEED_X);
 
-        } else if (coorY < targetCoorY){
-            coorY += WALK_SPEED_Y;
+        } else if (getCoorY() < targetCoorY){
+            setCoorY(getCoorY() + WALK_SPEED_Y);
 
-        } else if (coorY > targetCoorY){
-            coorY -= WALK_SPEED_Y;
+        } else if (getCoorY() > targetCoorY){
+            setCoorY(getCoorY() - WALK_SPEED_Y);
 
         }
 
@@ -233,7 +234,7 @@ public class Passenger {
     public boolean sameCoor(double targetCoorX, double targetCoorY){
         boolean flag = false;
 
-        if (coorX == targetCoorX && coorY == targetCoorY){
+        if (getCoorX() == targetCoorX && getCoorY() == targetCoorY){
             flag = true;
         }
         return flag;
@@ -267,19 +268,18 @@ public class Passenger {
         }
 
 
-        if (coorX < TRIP_END_FLAG.getCoorX()){
-            coorX += WALK_SPEED_X;
+        if (getCoorX() < TRIP_END_FLAG.getCoorX()){
+            setCoorX(getCoorX() + WALK_SPEED_X);
 
-        } else if (coorX > TRIP_END_FLAG.getCoorX()){
-            coorX -= WALK_SPEED_X;
-
+        } else if (getCoorX() > TRIP_END_FLAG.getCoorX()){
+            setCoorX(getCoorX() - WALK_SPEED_X);
         }
 
-        if (coorY < TRIP_END_FLAG.getCoorY()){
-            coorY += WALK_SPEED_Y;
+        if (getCoorY() < TRIP_END_FLAG.getCoorY()){
+            setCoorY(getCoorY() + WALK_SPEED_Y);
 
-        } else if (coorY > TRIP_END_FLAG.getCoorY()){
-            coorY -= WALK_SPEED_Y;
+        } else if (getCoorY() > TRIP_END_FLAG.getCoorY()){
+            setCoorY(getCoorY() - WALK_SPEED_Y);
 
         }
 
@@ -334,8 +334,29 @@ public class Passenger {
      * @return String of states in passenger class
      */
     public String toString(){
-        return "Passenger\n" + "_____________\n" + "IMAGE: " + IMAGE + "\nx-coordinate: " + coorX + "\n" +"y" +
-                "-coordinate: " + coorY + "\n" +
-                "priority: " + priority + "\n" + TRIP_END_FLAG;
+        return "Passenger\n" + "_____________\n" + "IMAGE: " + IMAGE + "\nx-coordinate: " + getCoorX() + "\n" +"y" +
+                "-coordinate: " + getCoorY() + "\n" +
+                "priority: " + priority + "\n" + TRIP_END_FLAG +
+                "has umbrella: " + hasUmbrella;
+    }
+
+    public void eject(){
+        return;
+    }
+
+    public void followDriver(Driver driver){
+        return;
+    }
+
+    /**
+     * If health is equal or less than 0, blood is set active
+     */
+    public void checkHealth(){
+
+    }
+
+    @Override
+    public void takeDamage(DamageDealer damageDealer) {
+
     }
 }

@@ -5,19 +5,16 @@ import java.util.Properties;
  * This Java class contains attributes and methods related to Coin
  * @author Alysha Thean Student ID: 1495768
  */
-public class Coin {
+public class Coin extends GameEntity{
 
     public final static int MOVE_FRAME = 5;
 
-    public final Properties GAME_PROPS;
-    public final Image IMAGE;
     public final int DISPLAY_FRAME_COOR_X;
     public final int DISPLAY_FRAME_COOR_Y;
     public final double RADIUS;
     public final int MAX_FRAMES;
 
-    private int coorX;
-    private int coorY;
+
     private boolean isCollided;
     private int currentFrame;
 
@@ -28,50 +25,18 @@ public class Coin {
      * @param coorY integer of coin's y-coordinate
      */
     public Coin(Properties gameProps, int coorX, int coorY){
-        this.GAME_PROPS = gameProps;
+        super(gameProps, coorX, coorY);
+
         this.IMAGE = new Image(gameProps.getProperty("gameObjects.coin.image"));
         this.DISPLAY_FRAME_COOR_X = Integer.parseInt(gameProps.getProperty("gameplay.coin.x"));
         this.DISPLAY_FRAME_COOR_Y = Integer.parseInt(gameProps.getProperty("gameplay.coin.y"));
         this.RADIUS = Double.parseDouble(gameProps.getProperty("gameObjects.coin.radius"));
         this.MAX_FRAMES = Integer.parseInt(gameProps.getProperty("gameObjects.coin.maxFrames"));
 
-        this.coorX = coorX;
-        this.coorY = coorY;
         this.isCollided = false;
         this.currentFrame = 0;
     }
 
-    /**
-     * Getter method of coin's x-coordinate
-     * @return integer of coin's x-coordinate
-     */
-    public int getCoorX() {
-        return coorX;
-    }
-
-    /**
-     * Setter method of coin's x-coordinate
-     * @param coorX integer of coin's x-coordinate
-     */
-    public void setCoorX(int coorX) {
-        this.coorX = coorX;
-    }
-
-    /**
-     * Getter method of coin's y-coordinate
-     * @return integer of coin's y-coordinate
-     */
-    public int getCoorY() {
-        return coorY;
-    }
-
-    /**
-     * Setter method of coin's y-coordinate
-     * @param coorY integer of coin's y-coordinate
-     */
-    public void setCoorY(int coorY) {
-        this.coorY = coorY;
-    }
 
     /**
      * Getter method of whether coin is collided
@@ -109,7 +74,7 @@ public class Coin {
      * Moves coin down by incrementing its y-coordinates based on MOVE_FRAME
      */
     public void moveDown(){
-        coorY += MOVE_FRAME;
+        setCoorY(getCoorY() + MOVE_FRAME);
     }
 
     /**
@@ -154,7 +119,7 @@ public class Coin {
      * @return double of distance between coin and target
      */
     public double calcDist(double targetCoorX, double targetCoorY){
-        return Math.sqrt(Math.pow(coorX - targetCoorX, 2) + Math.pow(coorY - targetCoorY, 2));
+        return Math.sqrt(Math.pow(getCoorX() - targetCoorX, 2) + Math.pow(getCoorY() - targetCoorY, 2));
     }
 
     /**
@@ -162,8 +127,22 @@ public class Coin {
      * @return String of states of coin
      */
     public String toString(){
-        return "Coin\n" + "_____________\nx-coordinate: " + coorX + "\ny-coordinate: " + coorY + "\nis collided: " +
+        return "Coin\n" + "_____________\nx-coordinate: " + getCoorX() + "\ny-coordinate: " + getCoorY() + "\nis collided: " +
                 isCollided + "\ncurrent frame:" + currentFrame;
+    }
+
+    public boolean hasCollided(Driver driver){
+        boolean flag = false;
+
+        double currentDist = calcDist(driver.getCoorX(), driver.getCoorY());
+        double currentRange = calcRange(driver.RADIUS);
+
+        if (currentDist <= currentRange){
+            flag = true;
+            setIsCollided(true);
+
+        }
+        return flag;
     }
 
 }

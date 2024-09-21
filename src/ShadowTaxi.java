@@ -9,9 +9,9 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public class ShadowTaxi extends AbstractGame {
-    private final Properties GAME_PROPS;
-    private final Properties MESSAGE_PROPS;
-    private final String SCORE_FILE;
+    public final Properties GAME_PROPS;
+    public final Properties MESSAGE_PROPS;
+    public final String SCORE_FILE;
 
     private HomeScreen homeScreen;
     private PlayerInfoScreen playerInfoScreen;
@@ -29,6 +29,7 @@ public class ShadowTaxi extends AbstractGame {
         super(Integer.parseInt(gameProps.getProperty("window.width")),
                 Integer.parseInt(gameProps.getProperty("window.height")),
                 messageProps.getProperty("home.title"));
+
 
         this.GAME_PROPS = gameProps;
         this.MESSAGE_PROPS = messageProps;

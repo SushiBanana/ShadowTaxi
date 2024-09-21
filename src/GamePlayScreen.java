@@ -1,6 +1,9 @@
+import bagel.Image;
 import bagel.Input;
 import bagel.Keys;
 import bagel.Window;
+
+import java.util.ArrayList;
 import java.util.Properties;
 
 /**
@@ -14,7 +17,9 @@ public class GamePlayScreen extends Screen{
     public static final int EARNING_GAP = 100;
     public static final int FRAME_GREATER = 1152;
 
+    public final Image BACKGROUND_RAIN; // new
     public final String OBJECT_FILE;
+    public final String WEATHER_FILE; // new
     public final double TARGET_SCORE;
     public final int MAX_FRAMES;
     public final int INFO_FONT_SIZE;
@@ -46,6 +51,32 @@ public class GamePlayScreen extends Screen{
     private Trip currentTrip;
     private Trip lastTrip;
 
+    // below are new attributes
+
+    public static final int MIN_RANGE = 1;
+    public static final int MAX_RANGE = 1000;
+
+
+
+    public final int LANE_CENTRE_1;
+    public final int LANE_CENTRE_2;
+    public final int LANE_CENTRE_3;
+    public final int PASSENGER_HEALTH_COOR_X;
+    public final int PASSENGER_HEALTH_COOR_Y;
+    public final int DRIVER_HEALTH_COOR_X;
+    public final int DRIVER_HEALTH_COOR_Y;
+    public final int TAXI_HEALTH_COOR_X;
+    public final int TAXI_HEALTH_COOR_Y;
+    public final String[][] GAME_WEATHER;
+
+
+    private ArrayList<Car> cars;
+    private int randomNumber;
+    private InvinciblePower[] invinciblePowers;
+    private boolean isRaining;
+    private Taxi damagedTaxi;
+
+
     /**
      * Constructor for Game Play Screen class, it also initialises objects from OBJECT_FILE
      * @param gameProps properties file for values of various attributes
@@ -53,7 +84,10 @@ public class GamePlayScreen extends Screen{
      */
     public GamePlayScreen(Properties gameProps, Properties messageProps) {
         super(gameProps, messageProps, gameProps.getProperty("backgroundImage.sunny"));
+
+        this.BACKGROUND_RAIN = new Image (gameProps.getProperty("backgroundImage.raining"));
         this.OBJECT_FILE = gameProps.getProperty("gamePlay.objectsFile");
+        this.WEATHER_FILE = gameProps.getProperty("gamePlay.weatherFile");
 
         this.TARGET_SCORE = Double.parseDouble(gameProps.getProperty("gamePlay.target"));
         this.MAX_FRAMES = Integer.parseInt(gameProps.getProperty("gamePlay.maxFrames"));
@@ -78,6 +112,21 @@ public class GamePlayScreen extends Screen{
         this.isCoinActive = false;
 
         initialiseClasses(IOUtils.readCommaSeparatedFile(OBJECT_FILE));
+        //
+
+        this.LANE_CENTRE_1 = Integer.parseInt(gameProps.getProperty("roadLaneCenter1"));
+        this.LANE_CENTRE_2 = Integer.parseInt(gameProps.getProperty("roadLaneCenter2"));
+        this.LANE_CENTRE_3 = Integer.parseInt(gameProps.getProperty("roadLaneCenter3"));
+        this.PASSENGER_HEALTH_COOR_X = Integer.parseInt(gameProps.getProperty("gamePlay.passengerHealth.x"));
+        this.PASSENGER_HEALTH_COOR_Y = Integer.parseInt(gameProps.getProperty("gamePlay.passengerHealth.y"));
+        this.DRIVER_HEALTH_COOR_X = Integer.parseInt(gameProps.getProperty("gamePlay.driverHealth.x"));
+        this.DRIVER_HEALTH_COOR_Y = Integer.parseInt(gameProps.getProperty("gamePlay.driverHealth.y"));
+        this.TAXI_HEALTH_COOR_X = Integer.parseInt(gameProps.getProperty("gamePlay.taxiHealth.x"));
+        this.TAXI_HEALTH_COOR_Y = Integer.parseInt(gameProps.getProperty("gamePlay.taxiHealth.y"));
+
+        this.GAME_WEATHER = IOUtils.readCommaSeparatedFile(WEATHER_FILE);
+        this.isRaining = false;
+
     }
 
     /**
@@ -182,9 +231,10 @@ public class GamePlayScreen extends Screen{
      * @param input keyboard input
      */
     public void loadScreen(Input input){
+        randomNumber = MiscUtils.getRandomInt(MIN_RANGE, MAX_RANGE);
+
         setName(name);
-        IMAGE.draw(Window.getWidth()/2.0, bottomCoorY);
-        IMAGE.draw(Window.getWidth()/2.0, topCoorY);
+        loadWeather();
         taxi.IMAGE.draw(taxi.getCoorX(), taxi.getCoorY());
 
         loadTopLeft();
@@ -200,11 +250,15 @@ public class GamePlayScreen extends Screen{
         collideCoins(coins);
         handleCoinFrames();
 
+        //
+        loadInvinciblePowers(invinciblePowers);
+
         if (input.isDown(Keys.UP)) {
             moveScreenDown();
             movePassengersDown(passengers);
             moveCoinsDown(coins);
             incrementDistTravelled();
+            moveInvinciblePowersDown(invinciblePowers);
         }
 
         if (input.isDown(Keys.LEFT)) {
@@ -229,12 +283,16 @@ public class GamePlayScreen extends Screen{
         Passenger[] tempPassengers = new Passenger[totalNoPassengers];
         int currPassengerIndex = 0;
 
+        int totalNoInvinciblePower = findNoOfObjects(allGameEntities, "INVINCIBLE_POWER");
+        InvinciblePower[] tempInvinciblePowers = new InvinciblePower[totalNoInvinciblePower];
+        int currInvinciblePowerIndex = 0;
+
         for (int i = 0; i < allGameEntities.length; i++) {
 
             switch (allGameEntities[i][0]) {
                 case "TAXI":
                     taxi = new Taxi(GAME_PROPS, Integer.parseInt(allGameEntities[i][1]),
-                            Integer.parseInt(allGameEntities[i][2]));
+                            Integer.parseInt(allGameEntities[i][2]), false);
                     break;
 
                 case "COIN":
@@ -244,18 +302,32 @@ public class GamePlayScreen extends Screen{
                     break;
 
                 case "PASSENGER":
+                    boolean tempBool;
+                    int tempInt = Integer.parseInt(allGameEntities[i][6]);
+
+                    if (tempInt == 1){
+                        tempBool = true;
+                    } else {
+                        tempBool = false;
+                    }
                     Passenger newPassenger = new Passenger(GAME_PROPS, Integer.parseInt(allGameEntities[i][1]),
                             Integer.parseInt(allGameEntities[i][2]), Integer.parseInt(allGameEntities[i][3]),
-                            Integer.parseInt(allGameEntities[i][4]), Integer.parseInt(allGameEntities[i][5]));
+                            Integer.parseInt(allGameEntities[i][4]), Integer.parseInt(allGameEntities[i][5]), tempBool);
 
                     tempPassengers[currPassengerIndex++] = newPassenger;
                     break;
 
-            }
+                case "INVINCIBLE_POWER":
+                    InvinciblePower newInvinciblePower = new InvinciblePower(GAME_PROPS,
+                            Integer.parseInt(allGameEntities[i][1]), Integer.parseInt(allGameEntities[i][2]));
+                    tempInvinciblePowers[currInvinciblePowerIndex++] = newInvinciblePower;
+                    break;
 
+            }
         }
         coins = tempCoins;
         passengers = tempPassengers;
+        invinciblePowers = tempInvinciblePowers;
     }
 
     /**
@@ -358,7 +430,6 @@ public class GamePlayScreen extends Screen{
                 }
             }
         }
-
     }
 
     /**
@@ -527,6 +598,8 @@ public class GamePlayScreen extends Screen{
         if (p.TRIP_END_FLAG.getIsVisible()){
             if (!p.sameCoor(p.TRIP_END_FLAG.getCoorX(), p.TRIP_END_FLAG.getCoorY())) {
                 p.moveTowardsFlag();
+            } else {
+                p.TRIP_END_FLAG.setIsVisible(false);
             }
 
         }
@@ -616,4 +689,113 @@ public class GamePlayScreen extends Screen{
         }
         currentTrip.incrementDistTravelled();
     }
+
+    /**
+     * Loads the background of game's weather
+     */
+    public void loadWeather() {
+
+        for (int i = 0; i < GAME_WEATHER.length; i++) {
+
+            String weather = GAME_WEATHER[i][0];
+            int startFrame = Integer.parseInt(GAME_WEATHER[i][1]);
+            int endFrame = Integer.parseInt(GAME_WEATHER[i][2]);
+
+            if (frameLeft >= startFrame && frameLeft <= endFrame){
+                switch(weather) {
+                    case ("SUNNY"):
+                        IMAGE.draw(Window.getWidth()/2.0, bottomCoorY);
+                        IMAGE.draw(Window.getWidth()/2.0, topCoorY);
+                        isRaining = false;
+                        break;
+
+                    case("RAINING"):
+                        BACKGROUND_RAIN.draw(Window.getWidth()/2.0, bottomCoorY);
+                        BACKGROUND_RAIN.draw(Window.getWidth()/2.0, topCoorY);
+                        isRaining = true;
+                        break;
+                }
+                break;
+            }
+
+
+        }
+    }
+
+    /**
+     * Creates OtherCars and EnemyCars based on random number
+     * @param randomNumber integer of random number
+     */
+    public void createCar(int randomNumber){
+        if (randomNumber % OtherCar.DIVISIBILITY == 0) {
+
+        }
+    }
+
+    /**
+     * Checks collisions with other GameEntities
+     */
+    public void checkCollisions(){
+        return;
+    }
+
+    /**
+     * Checks the collision between 2 GameEntity
+     * @param gameEntity1 First GameEntity to compare
+     * @param gameEntity2 Second GameEntity to compare
+     * @return true if collided, false otherwise
+     */
+    public boolean checkCollision(GameEntity gameEntity1, GameEntity gameEntity2){
+        return false;
+    }
+
+
+    /**
+     * Loads Invincible Powers to GamePlayScreen
+     * @param invinciblePowers array of Invincible Power
+     */
+    public void loadInvinciblePowers(InvinciblePower[] invinciblePowers){
+        for (InvinciblePower i: invinciblePowers){
+
+            if(!i.getIsCollided()){
+                i.IMAGE.draw(i.getCoorX(), i.getCoorY());
+
+            }
+
+        }
+    }
+
+    /**
+     * Moves Invincible Powers down
+     * @param invinciblePowers array of Invincible Power
+     */
+    public void moveInvinciblePowersDown(InvinciblePower[] invinciblePowers){
+        for (InvinciblePower i: invinciblePowers){
+            i.moveDown();
+        }
+    }
+
+    /**
+     * Handles the collisions of different GameEntity with Invincible Powers
+     */
+    public void collideInvinciblePowers(){
+        return;
+    }
+
+    /**
+     * Assigns a new taxi if current taxi is permanently damaged
+     */
+    public void assignNewTaxi(){
+        return;
+    }
+
+    public int findPassengerMinHealth(Passenger[] passengers){
+        return 1;
+    }
+
+
+
+
+
+
 }
