@@ -35,7 +35,7 @@ public class Passenger extends GameEntity implements Damageable{
     public final int RADIUS;
     public final int TAXI_GET_IN_RADIUS;
 
-    private int health;
+    private double health;
     private boolean hasUmbrella;
     private Blood blood;
     private boolean isEjected;
@@ -70,11 +70,12 @@ public class Passenger extends GameEntity implements Damageable{
         this.isDroppedOff = false;
 
         //
+        this.hasUmbrella = hasUmbrella;
         this.isEjected = false;
 
         this.RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.passenger.radius"));
         this.TAXI_GET_IN_RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.passenger.taxiGetInRadius"));
-        this.health = (int) (Double.parseDouble(gameProps.getProperty("gameObjects.passenger.health")) * 100);
+        this.health = (double) (Double.parseDouble(gameProps.getProperty("gameObjects.passenger.health")) * 100);
 
     }
 
@@ -172,6 +173,22 @@ public class Passenger extends GameEntity implements Damageable{
      */
     public void setHasUmbrella(boolean hasUmbrella) {
         this.hasUmbrella = hasUmbrella;
+    }
+
+    /**
+     * Getter method of passenger's health
+     * @return double of passenger's health
+     */
+    public double getHealth() {
+        return health;
+    }
+
+    /**
+     * Setter method of passenger's health
+     * @param health double of passenger's health
+     */
+    public void setHealth(double health) {
+        this.health = health;
     }
 
     /**

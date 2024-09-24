@@ -29,7 +29,7 @@ public class GameEndScreen extends Screen{
         this.SCORE_FILE = gameProps.getProperty("gameEnd.scoresFile");
         this.TOP_5_SCORES_WORD = messageProps.getProperty("gameEnd.highestScores");
         this.WIN_INSTRUCTION_WORD = messageProps.getProperty("gameEnd.won");
-        this.LOSE_INSTRUCTION_WORD = messageProps.getProperty("gameEnd.lose");
+        this.LOSE_INSTRUCTION_WORD = messageProps.getProperty("gameEnd.lost");
         this.STATUS_FONT_SIZE = Integer.parseInt(gameProps.getProperty("gameEnd.status.fontSize"));
         this.SCORES_FONT_SIZE = Integer.parseInt(gameProps.getProperty("gameEnd.scores.fontSize"));
         this.TOP_5_SCORES_COOR_Y = Integer.parseInt(gameProps.getProperty("gameEnd.scores.y"));

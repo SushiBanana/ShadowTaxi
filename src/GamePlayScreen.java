@@ -17,6 +17,7 @@ public class GamePlayScreen extends Screen{
     public static final int EARNING_GAP = 100;
     public static final int FRAME_GREATER = 1152;
 
+
     public final Image BACKGROUND_RAIN; // new
     public final String OBJECT_FILE;
     public final String WEATHER_FILE; // new
@@ -53,8 +54,9 @@ public class GamePlayScreen extends Screen{
 
     // below are new attributes
 
-    public static final int MIN_RANGE = 1;
-    public static final int MAX_RANGE = 1000;
+
+    public static final int NUM_LANES = 3;
+    public static final int NUM_RANDOM_Y_COOR = 2;
 
 
 
@@ -68,6 +70,11 @@ public class GamePlayScreen extends Screen{
     public final int TAXI_HEALTH_COOR_X;
     public final int TAXI_HEALTH_COOR_Y;
     public final String[][] GAME_WEATHER;
+    public final String TAXI_HEALTH_WORD;
+    public final String DRIVER_HEALTH_WORD;
+    public final String PASSENGER_HEALTH_WORD;
+    public final int TAXI_MAX_SPAWN_MAX_Y;
+    public final int TAXI_MAX_SPAWN_MIN_Y;
 
 
     private ArrayList<Car> cars;
@@ -75,6 +82,7 @@ public class GamePlayScreen extends Screen{
     private InvinciblePower[] invinciblePowers;
     private boolean isRaining;
     private Taxi damagedTaxi;
+    private Driver driver;
 
 
     /**
@@ -123,9 +131,17 @@ public class GamePlayScreen extends Screen{
         this.DRIVER_HEALTH_COOR_Y = Integer.parseInt(gameProps.getProperty("gamePlay.driverHealth.y"));
         this.TAXI_HEALTH_COOR_X = Integer.parseInt(gameProps.getProperty("gamePlay.taxiHealth.x"));
         this.TAXI_HEALTH_COOR_Y = Integer.parseInt(gameProps.getProperty("gamePlay.taxiHealth.y"));
+        this.TAXI_HEALTH_WORD = messageProps.getProperty("gamePlay.taxiHealth");
+        this.DRIVER_HEALTH_WORD = messageProps.getProperty("gamePlay.driverHealth");
+        this.PASSENGER_HEALTH_WORD = messageProps.getProperty("gamePlay.passengerHealth");
+        this.TAXI_MAX_SPAWN_MAX_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.nextSpawnMaxY"));
+        this.TAXI_MAX_SPAWN_MIN_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.nextSpawnMinY"));
+
 
         this.GAME_WEATHER = IOUtils.readCommaSeparatedFile(WEATHER_FILE);
         this.isRaining = false;
+        this.driver = new Driver(gameProps, 0, 0);
+        this.cars = new ArrayList<>();
 
     }
 
@@ -231,12 +247,11 @@ public class GamePlayScreen extends Screen{
      * @param input keyboard input
      */
     public void loadScreen(Input input){
-        randomNumber = MiscUtils.getRandomInt(MIN_RANGE, MAX_RANGE);
 
         setName(name);
         loadWeather();
-        taxi.IMAGE.draw(taxi.getCoorX(), taxi.getCoorY());
 
+        loadTaxis();
         loadTopLeft();
         loadTopRight();
         loadPassengers(passengers);
@@ -252,13 +267,24 @@ public class GamePlayScreen extends Screen{
 
         //
         loadInvinciblePowers(invinciblePowers);
+        loadDriver();
+        createCars();
+        moveCars(cars, input);
+        loadCars(cars);
+
+        checkCollisions();
+        decrementCollisionTimeout();
+
 
         if (input.isDown(Keys.UP)) {
+
             moveScreenDown();
             movePassengersDown(passengers);
             moveCoinsDown(coins);
             incrementDistTravelled();
             moveInvinciblePowersDown(invinciblePowers);
+            moveTaxiDown();
+
         }
 
         if (input.isDown(Keys.LEFT)) {
@@ -323,6 +349,10 @@ public class GamePlayScreen extends Screen{
                     tempInvinciblePowers[currInvinciblePowerIndex++] = newInvinciblePower;
                     break;
 
+                case "DRIVER":
+                    driver = new Driver(GAME_PROPS, Integer.parseInt(allGameEntities[i][1]),
+                            Integer.parseInt(allGameEntities[i][2]));
+                    break;
             }
         }
         coins = tempCoins;
@@ -561,6 +591,24 @@ public class GamePlayScreen extends Screen{
                         collidedCoin.DISPLAY_FRAME_COOR_Y);
             }
         }
+
+        String taxiHealth = String.format("%.1f", taxi.getHealth());
+        loadFont(FONT_FILE, TAXI_HEALTH_WORD + taxiHealth, INFO_FONT_SIZE, TAXI_HEALTH_COOR_X,
+                TAXI_HEALTH_COOR_Y);
+
+        String driverHealth = String.format("%.1f", driver.getHealth());
+        loadFont(FONT_FILE, DRIVER_HEALTH_WORD + driverHealth, INFO_FONT_SIZE, DRIVER_HEALTH_COOR_X,
+                DRIVER_HEALTH_COOR_Y);
+
+        String passengerHealth;
+        if (currentTrip == null){
+            passengerHealth = String.format("%.1f", findPassengerMinHealth(passengers));
+
+        } else {
+            passengerHealth = String.format("%.1f", currentTrip.PASSENGER.getHealth());
+        }
+        loadFont(FONT_FILE, PASSENGER_HEALTH_WORD + passengerHealth, INFO_FONT_SIZE, PASSENGER_HEALTH_COOR_X,
+                PASSENGER_HEALTH_COOR_Y);
     }
 
     /**
@@ -723,30 +771,89 @@ public class GamePlayScreen extends Screen{
     }
 
     /**
-     * Creates OtherCars and EnemyCars based on random number
-     * @param randomNumber integer of random number
+     * Creates OtherCars and EnemyCars based on whether they can spawn
      */
-    public void createCar(int randomNumber){
-        if (randomNumber % OtherCar.DIVISIBILITY == 0) {
+    public void createCars(){
+        Car newCar;
+        if(MiscUtils.canSpawn(OtherCar.DIVISIBILITY)){
+            newCar = new OtherCar(GAME_PROPS, randomLaneNumber(), randomYCoor());
+            cars.add(newCar);
+
+        } else if (MiscUtils.canSpawn(EnemyCar.DIVISIBILITY)){
+            newCar = new EnemyCar(GAME_PROPS, randomLaneNumber(), randomYCoor());
+            cars.add(newCar);
 
         }
+
     }
+
+    public int randomLaneNumber(){
+        int sentinelLane = MiscUtils.getRandomInt(1, NUM_LANES + 1);
+        int randNumLane;
+
+        switch(sentinelLane){
+            case 1:
+                randNumLane = LANE_CENTRE_1;
+                break;
+            case 2:
+                randNumLane = LANE_CENTRE_2;
+                break;
+            case 3:
+                randNumLane = LANE_CENTRE_3;
+                break;
+            default:
+                randNumLane = 0;
+                break;
+        }
+
+        return randNumLane;
+
+    }
+
+    public int randomYCoor(){
+        int sentinelYCoor = MiscUtils.getRandomInt(1, NUM_RANDOM_Y_COOR + 1);
+        int randYCoor;
+
+        switch(sentinelYCoor){
+            case 1:
+                randYCoor = Car.CAR_COOR_Y_RAND_1;
+                break;
+            case 2:
+                randYCoor = Car.CAR_COOR_Y_RAND_2;
+                break;
+            default:
+                randYCoor = 0;
+                break;
+        }
+        return randYCoor;
+
+    }
+
 
     /**
      * Checks collisions with other GameEntities
      */
     public void checkCollisions(){
-        return;
+
+        for (Car c: cars){
+            checkCollision(taxi, c);
+        }
     }
 
-    /**
-     * Checks the collision between 2 GameEntity
-     * @param gameEntity1 First GameEntity to compare
-     * @param gameEntity2 Second GameEntity to compare
-     * @return true if collided, false otherwise
-     */
-    public boolean checkCollision(GameEntity gameEntity1, GameEntity gameEntity2){
-        return false;
+
+    public void checkCollision(Taxi taxi, Car car){
+        double sumOfRadius = taxi.RADIUS + car.RADIUS;
+        if (taxi.calcDist(car.getCoorX(), car.getCoorY()) < sumOfRadius && car.getIsActive() &&
+                taxi.getCollisionTimeoutLeft() == 0) {
+
+            taxi.takeDamage(car);
+            car.takeDamage(taxi);
+
+        }
+    }
+
+    public void decrementCollisionTimeout(){
+        taxi.decrementCollisionTimeoutLeft();
     }
 
 
@@ -786,14 +893,89 @@ public class GamePlayScreen extends Screen{
      * Assigns a new taxi if current taxi is permanently damaged
      */
     public void assignNewTaxi(){
-        return;
+        if (taxi.getIsDamaged()){
+            damagedTaxi = new Taxi(GAME_PROPS, taxi.getCoorX(), taxi.getCoorY(), true);
+
+            int newSpawnCoorY = MiscUtils.getRandomInt(TAXI_MAX_SPAWN_MIN_Y, TAXI_MAX_SPAWN_MAX_Y + 1);
+            taxi = new Taxi(GAME_PROPS, randomLaneNumber(), newSpawnCoorY, false);
+        }
     }
 
-    public int findPassengerMinHealth(Passenger[] passengers){
-        return 1;
+    public void loadTaxis(){
+        if (taxi != null){
+            taxi.IMAGE.draw(taxi.getCoorX(), taxi.getCoorY());
+        }
+
+        if (damagedTaxi != null){
+            damagedTaxi.IMAGE.draw(damagedTaxi.getCoorX(), damagedTaxi.getCoorY());
+        }
+
+        assignNewTaxi();
+    }
+
+    public double findPassengerMinHealth(Passenger[] passengers){
+        double minHealth = Double.MAX_VALUE;
+        for (Passenger p: passengers){
+            if (p.getHealth() < minHealth){
+                minHealth = p.getHealth();
+            }
+        }
+        return minHealth;
+    }
+
+    public void loadDriver(){
+        if (driver.getIsEjected()){
+            driver.IMAGE.draw(driver.getCoorX(), driver.getCoorY());
+        }
+    }
+
+    public void loadCars(ArrayList<Car> cars){
+        for (Car c: cars){
+            if (c.getIsActive()) {
+                c.IMAGE.draw(c.getCoorX(), c.getCoorY());
+
+            }
+        }
     }
 
 
+    public void moveCars(ArrayList<Car> cars, Input input){
+        if (input.isDown(Keys.UP)){
+            for (Car c: cars){
+                c.moveRelativeToTaxi();
+            }
+        } else {
+            for (Car c: cars) {
+                c.move();
+            }
+        }
+
+    }
+
+
+
+    public boolean noKeysPressed(Input input){
+        boolean flag;
+        if (!input.isDown(Keys.UP) && !input.isDown(Keys.RIGHT) && !input.isDown(Keys.LEFT)){
+            flag = true;
+        } else {
+            flag = false;
+        }
+        return flag;
+    }
+
+    public void moveTaxiDown(){
+        if (damagedTaxi != null){
+            damagedTaxi.moveDown();
+
+        }
+        if (!taxi.getHasDriver()) {
+            taxi.moveDown();
+        }
+    }
+
+    // once taxi is damaged, driver gets ejected, and movement input is given to driver
+    // collision logic not yet implemented
 
 
 

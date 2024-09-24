@@ -44,4 +44,9 @@ public class Fireball extends GameEntity implements DamageDealer{
         return;
     }
 
+    @Override
+    public double getDamagePoints() {
+        return DAMAGE_POINTS;
+    }
+
 }

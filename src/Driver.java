@@ -15,7 +15,7 @@ public class Driver extends GameEntity implements Damageable{
     public final int RADIUS;
     public final int TAXI_GET_IN_RADIUS;
 
-    private int health;
+    private double health;
     private int collisionTimeoutLeft;
     private boolean isActive;
     private boolean isEjected;
@@ -31,11 +31,42 @@ public class Driver extends GameEntity implements Damageable{
         this.RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.driver.radius"));
         this.TAXI_GET_IN_RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.driver.taxiGetInRadius"));
 
-        this.health = (int) (Double.parseDouble(gameProps.getProperty("gameObjects.driver.health")) * 100);
+        this.health = (double) (Double.parseDouble(gameProps.getProperty("gameObjects.driver.health")) * 100);
         this.isActive = false;
         this.isEjected = false;
     }
 
+    /**
+     * Getter method for driver's health
+     * @return double of driver's health
+     */
+    public double getHealth() {
+        return health;
+    }
+
+    /**
+     * Setter method for driver's health
+     * @param health double of driver's health
+     */
+    public void setHealth(double health) {
+        this.health = health;
+    }
+
+    /**
+     * Getter method for whether driver is ejected
+     * @return true if driver has been ejected, false otherwise
+     */
+    public boolean getIsEjected() {
+        return isEjected;
+    }
+
+    /**
+     * Setter method for whether driver is ejected
+     * @param ejected true if driver has been ejected, false otherwise
+     */
+    public void setIsEjected(boolean ejected) {
+        isEjected = ejected;
+    }
 
     public void eject(){
         return;

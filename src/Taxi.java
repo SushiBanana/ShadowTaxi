@@ -8,7 +8,7 @@ import java.util.Properties;
 public class Taxi extends GameEntity implements Damageable, DamageDealer{
 
     public final double RADIUS;
-    public final int MOVE_FRAME;
+    public final int MOVE_FRAME_X;
     public final Image UNDAMAGED_IMAGE;
     public final Image DAMAGED_IMAGE;
 
@@ -18,17 +18,18 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
     public final static int COLLISION_TIMEOUT = 200;
     public final static int MOMENTUM = 10;
 
-    public final int DAMAGE_POINTS;
+    public final double DAMAGE_POINTS;
     public final int SPAWN_MIN_Y;
     public final int SPAWN_MAX_Y;
+    public final int MOVE_FRAME_Y;
 
-    private int health;
+    private double health;
     private int collisionTimeoutLeft;
     private Smoke smoke;
     private Fire fire;
     private int momentumCurrentFrame;
     private boolean isDamaged;
-    private Driver driver;
+    private boolean hasDriver;
 
 
     /**
@@ -47,18 +48,21 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
 
 
         this.RADIUS = Double.parseDouble(gameProps.getProperty("gameObjects.taxi.radius"));
-        this.MOVE_FRAME = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.speedX"));
+        this.MOVE_FRAME_X = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.speedX"));
 
         this.currentPassenger = null;
 
         //
-        this.DAMAGE_POINTS = (int) (Double.parseDouble(gameProps.getProperty("gameObjects.taxi.health")) * 100);
+        this.DAMAGE_POINTS = Double.parseDouble(gameProps.getProperty("gameObjects.taxi.health")) * 100;
         this.SPAWN_MIN_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.nextSpawnMinY"));
         this.SPAWN_MAX_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.nextSpawnMaxY"));
+        this.MOVE_FRAME_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.speedY"));
 
 
-        this.health = (int) (Double.parseDouble(gameProps.getProperty("gameObjects.taxi.damage")) * 100);
+        this.health = (Double.parseDouble(gameProps.getProperty("gameObjects.taxi.damage")) * 100);
         this.isDamaged = isDamaged;
+        this.collisionTimeoutLeft = 0;
+        this.hasDriver = true;
 
     }
 
@@ -79,17 +83,57 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
     }
 
     /**
+     * Getter method for taxi's health
+     * @return double of taxi's health
+     */
+    public double getHealth() {
+        return health;
+    }
+
+    /**
+     * Setter method for taxi's health
+     * @param health double of taxi's health
+     */
+    public void setHealth(double health) {
+        this.health = health;
+    }
+
+    public boolean getIsDamaged(){
+        return isDamaged;
+    }
+
+    public void setIsDamaged(boolean isDamaged){
+        this.isDamaged = isDamaged;
+    }
+
+    public boolean getHasDriver(){
+        return hasDriver;
+    }
+
+    public void setHasDriver(boolean hasDriver){
+        this.hasDriver = hasDriver;
+    }
+
+    public int getCollisionTimeoutLeft() {
+        return collisionTimeoutLeft;
+    }
+
+    public void setCollisionTimeoutLeft(int collisionTimeoutLeft) {
+        this.collisionTimeoutLeft = collisionTimeoutLeft;
+    }
+
+    /**
      * Decrements the x-coordinate of taxi when moving left based on MOVE_FRAME
      */
     public void moveLeft(){
-        setCoorX(getCoorX() - MOVE_FRAME);
+        setCoorX(getCoorX() - MOVE_FRAME_X);
     }
 
     /**
      * Increments the x-coordinate of taxi when moving right based on MOVE_FRAME
      */
     public void moveRight(){
-        setCoorX(getCoorX() + MOVE_FRAME);
+        setCoorX(getCoorX() + MOVE_FRAME_X);
     }
 
     /**
@@ -123,8 +167,9 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
      * @return String of states in taxi class
      */
     public String toString(){
-        return "Taxi\n" + "_____________\nIMAGE: " + IMAGE + "\nRADIUS: " + RADIUS + "\nMOVE_FRAME: " + MOVE_FRAME +
-                "\nx" + "-coordinate: " + getCoorX() + "\ny-coordinate: " + getCoorY() + "\n";
+        return "Taxi\n" + "_____________\nIMAGE: " + IMAGE + "\nRADIUS: " + RADIUS + "\nMOVE_FRAME_X: " + MOVE_FRAME_X +
+                "\nx" + "-coordinate: " + getCoorX() + "\ny-coordinate: " + getCoorY() + "\n" + "DAMAGE_POINTS: " +
+                DAMAGE_POINTS;
     }
 
     public Image generateImage(boolean isDamaged){
@@ -143,6 +188,7 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
     public boolean checkIfPermanentlyDamaged(){
         if (health <= 0){
             isDamaged = true;
+            hasDriver = false;
             return true;
         }
         return false;
@@ -158,13 +204,17 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
 
 
     /**
-     * Taxi takes damage from other Game Entity
-     *
-     * @param damageDealer GameEntity that inflicted damage on Taxi
+     * Taxi takes damage from a DamageDealer object if its health is above 0 and collision timeout left is 0
+     * @param damageDealer DamageDealer that inflicted damage on Taxi
      */
     @Override
     public void takeDamage(DamageDealer damageDealer) {
-        return;
+        if (health > 0 && collisionTimeoutLeft == 0){
+            health = health - damageDealer.getDamagePoints();
+            collisionTimeoutLeft = COLLISION_TIMEOUT;
+            checkIfPermanentlyDamaged();
+        }
+
     }
 
     /**
@@ -176,8 +226,23 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
         return;
     }
 
+    @Override
+    public double getDamagePoints() {
+        return DAMAGE_POINTS;
+    }
+
     public void ejectDriverPassenger(){
 
+    }
+
+    public void decrementCollisionTimeoutLeft(){
+        if (collisionTimeoutLeft > 0){
+            collisionTimeoutLeft--;
+        }
+    }
+
+    public void moveDown(){
+        setCoorY(getCoorY() + MOVE_FRAME_Y);
     }
 
 
