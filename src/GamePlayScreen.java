@@ -275,6 +275,8 @@ public class GamePlayScreen extends Screen{
         checkCollisions();
         decrementCollisionTimeout();
 
+        handleAllMomentum();
+
 
         if (input.isDown(Keys.UP)) {
 
@@ -838,22 +840,77 @@ public class GamePlayScreen extends Screen{
         for (Car c: cars){
             checkCollision(taxi, c);
         }
+
+        for (int i = 0; i < cars.size(); i++){
+            for (int j = 0; j < cars.size(); j++) {
+                if (i != j){
+                    checkCollision(cars.get(i), cars.get(j));
+
+                }
+            }
+        }
     }
 
 
     public void checkCollision(Taxi taxi, Car car){
         double sumOfRadius = taxi.RADIUS + car.RADIUS;
+
         if (taxi.calcDist(car.getCoorX(), car.getCoorY()) < sumOfRadius && car.getIsActive() &&
                 taxi.getCollisionTimeoutLeft() == 0) {
 
             taxi.takeDamage(car);
             car.takeDamage(taxi);
 
+            // taxi is above car
+            if (taxi.getCoorY() < car.getCoorY()) {
+                taxi.setMomentumCurrentFrame(-Taxi.MOMENTUM);
+                car.setMomentumCurrentFrame(Car.MOMENTUM);
+            } else {
+                taxi.setMomentumCurrentFrame(Taxi.MOMENTUM);
+                car.setMomentumCurrentFrame(-Car.MOMENTUM);
+            }
+
+        }
+    }
+
+    public void checkCollision(Car car1, Car car2) {
+        double sumOfRadius = car1.RADIUS + car2.RADIUS;
+        if (calcDist(car1, car2) < sumOfRadius && car1.getIsActive() && car2.getIsActive() && car1.getCollisionTimeoutLeft() == 0 && car2.getCollisionTimeoutLeft() == 0) {
+
+            car1.takeDamage(car2);
+            car2.takeDamage(car1);
+
+            System.out.println(car1);
+            System.out.println(car2);
+
+            // car1 is above car2
+            if (car1.getCoorY() < car2.getCoorY()) {
+                car1.setMomentumCurrentFrame(-Car.MOMENTUM);
+                car2.setMomentumCurrentFrame(Car.MOMENTUM);
+            } else {
+                car1.setMomentumCurrentFrame(Car.MOMENTUM);
+                car2.setMomentumCurrentFrame(-Car.MOMENTUM);
+            }
+
+        }
+    }
+
+    public double calcDist(GameEntity gameEntity1, GameEntity gameEntity2) {
+        return Math.sqrt(Math.pow(gameEntity1.getCoorX() - gameEntity2.getCoorX(), 2) + Math.pow(gameEntity1.getCoorY() - gameEntity2.getCoorY(), 2));
+    }
+
+    public void handleAllMomentum(){
+        taxi.handleMomentum();
+        for (Car c: cars){
+            c.handleMomentum();
         }
     }
 
     public void decrementCollisionTimeout(){
         taxi.decrementCollisionTimeoutLeft();
+        for (Car c: cars){
+            c.decrementCollisionTimeoutLeft();
+        }
     }
 
 
@@ -904,6 +961,15 @@ public class GamePlayScreen extends Screen{
     public void loadTaxis(){
         if (taxi != null){
             taxi.IMAGE.draw(taxi.getCoorX(), taxi.getCoorY());
+            if (taxi.FIRE.getIsActive()){
+                taxi.FIRE.IMAGE.draw(taxi.FIRE.getCoorX(), taxi.FIRE.getCoorY());
+                taxi.FIRE.incrementCurrentFrame();
+
+            }
+            if (taxi.SMOKE.getIsActive()){
+                taxi.SMOKE.IMAGE.draw(taxi.SMOKE.getCoorX(), taxi.SMOKE.getCoorY());
+                taxi.SMOKE.incrementCurrentFrame();
+            }
         }
 
         if (damagedTaxi != null){
@@ -933,7 +999,15 @@ public class GamePlayScreen extends Screen{
         for (Car c: cars){
             if (c.getIsActive()) {
                 c.IMAGE.draw(c.getCoorX(), c.getCoorY());
-
+            }
+            if (c.FIRE.getIsActive()){
+                c.FIRE.IMAGE.draw(c.FIRE.getCoorX(), c.FIRE.getCoorY());
+                c.FIRE.incrementCurrentFrame();
+                c.deactivateAfterFire();
+            }
+            if (c.SMOKE.getIsActive()){
+                c.SMOKE.IMAGE.draw(c.SMOKE.getCoorX(), c.SMOKE.getCoorY());
+                c.SMOKE.incrementCurrentFrame();
             }
         }
     }
@@ -975,7 +1049,6 @@ public class GamePlayScreen extends Screen{
     }
 
     // once taxi is damaged, driver gets ejected, and movement input is given to driver
-    // collision logic not yet implemented
 
 
 

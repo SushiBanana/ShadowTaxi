@@ -12,8 +12,17 @@ public class Fire extends Effect{
         this.IMAGE = new Image(gameProps.getProperty("gameObjects.fire.image"));
         this.TTL = Integer.parseInt(gameProps.getProperty("gameObjects.fire.ttl"));
 
-
     }
+
+    public void incrementCurrentFrame(){
+        if (getCurrentFrame() == TTL){
+            setIsActive(false);
+            return;
+        }
+
+        setCurrentFrame(getCurrentFrame() + 1);
+    }
+
 
     public String toString(){
         return "FIRE\n___________\n" + "TTL: " + TTL + "coor x: " + getCoorX() + "coor y: " + getCoorY();

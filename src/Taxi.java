@@ -22,11 +22,11 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
     public final int SPAWN_MIN_Y;
     public final int SPAWN_MAX_Y;
     public final int MOVE_FRAME_Y;
+    public Smoke SMOKE;
+    public Fire FIRE;
 
     private double health;
     private int collisionTimeoutLeft;
-    private Smoke smoke;
-    private Fire fire;
     private int momentumCurrentFrame;
     private boolean isDamaged;
     private boolean hasDriver;
@@ -63,6 +63,9 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
         this.isDamaged = isDamaged;
         this.collisionTimeoutLeft = 0;
         this.hasDriver = true;
+
+        this.FIRE = new Fire(gameProps, coorX, coorY);
+        this.SMOKE = new Smoke(gameProps, coorX, coorY);
 
     }
 
@@ -120,6 +123,14 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
 
     public void setCollisionTimeoutLeft(int collisionTimeoutLeft) {
         this.collisionTimeoutLeft = collisionTimeoutLeft;
+    }
+
+    public int getMomentumCurrentFrame() {
+        return momentumCurrentFrame;
+    }
+
+    public void setMomentumCurrentFrame(int momentumCurrentFrame) {
+        this.momentumCurrentFrame = momentumCurrentFrame;
     }
 
     /**
@@ -188,6 +199,8 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
     public boolean checkIfPermanentlyDamaged(){
         if (health <= 0){
             isDamaged = true;
+            SMOKE.setIsActive(false);
+            activateFire();
             hasDriver = false;
             return true;
         }
@@ -202,6 +215,17 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
         return;
     }
 
+    public void activateSmoke(){
+        SMOKE.setIsActive(true);
+        SMOKE.setCoorX(getCoorX());
+        SMOKE.setCoorY(getCoorY());
+    }
+
+    public void activateFire(){
+        SMOKE.setIsActive(true);
+        FIRE.setCoorX(getCoorX());
+        FIRE.setCoorY(getCoorY());
+    }
 
     /**
      * Taxi takes damage from a DamageDealer object if its health is above 0 and collision timeout left is 0
@@ -210,6 +234,7 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
     @Override
     public void takeDamage(DamageDealer damageDealer) {
         if (health > 0 && collisionTimeoutLeft == 0){
+            activateSmoke();
             health = health - damageDealer.getDamagePoints();
             collisionTimeoutLeft = COLLISION_TIMEOUT;
             checkIfPermanentlyDamaged();
@@ -231,9 +256,6 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
         return DAMAGE_POINTS;
     }
 
-    public void ejectDriverPassenger(){
-
-    }
 
     public void decrementCollisionTimeoutLeft(){
         if (collisionTimeoutLeft > 0){
@@ -242,7 +264,22 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
     }
 
     public void moveDown(){
+        FIRE.moveDown();
+        SMOKE.moveDown();
         setCoorY(getCoorY() + MOVE_FRAME_Y);
+    }
+
+    public void handleMomentum(){
+        if (momentumCurrentFrame == 0){
+            return;
+        }
+        if (momentumCurrentFrame > 0){
+            setCoorY(getCoorY() + 1);
+            momentumCurrentFrame--;
+        } else {
+            setCoorY(getCoorY() - 1);
+            momentumCurrentFrame++;
+        }
     }
 
 

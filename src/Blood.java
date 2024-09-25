@@ -14,6 +14,6 @@ public class Blood extends Effect{
 
     public String toString(){
         return "Blood\n_________\n" + "coor x: " + getCoorX() + "\ncoor y: " + getCoorY() + "\nframes left: "+
-                getFramesLeft() + "is active: " + getIsActive();
+                getCurrentFrame() + "is active: " + getIsActive();
     }
 }

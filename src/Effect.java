@@ -17,7 +17,7 @@ public abstract class Effect extends GameEntity{
 
     }
 
-    public int getFramesLeft() {
+    public int getCurrentFrame() {
         return currentFrame;
     }
 
@@ -33,9 +33,6 @@ public abstract class Effect extends GameEntity{
         isActive = active;
     }
 
-    public void decrementCurrentFrame(){
-        currentFrame--;
-    }
 
     public void moveDown(){
         setCoorY(getCoorY() - MOVE_FRAME);

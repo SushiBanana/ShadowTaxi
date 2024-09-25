@@ -17,9 +17,18 @@ public class Smoke extends Effect {
 
     }
 
+    public void incrementCurrentFrame(){
+        if (getCurrentFrame() == TTL){
+            setIsActive(false);
+            return;
+        }
+
+        setCurrentFrame(getCurrentFrame() + 1);
+    }
+
 
     public String toString(){
-        return "Smoke\n____________" + "\ncoorX: " + getCoorY() + "\ncoorY: " + getCoorY() + "\nframes left: " +
-                getFramesLeft() + "\nis active: " + getIsActive();
+        return "Smoke\n____________" + "\ncoorX: " + getCoorX() + "\ncoorY: " + getCoorY() + "\nframes left: " +
+                getCurrentFrame() + "\nis active: " + getIsActive();
     }
 }
