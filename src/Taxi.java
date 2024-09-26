@@ -19,6 +19,8 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
     //
     public final static int COLLISION_TIMEOUT = 200;
     public final static int MOMENTUM = 10;
+    public final static int COOR_Y_MOVEMENT_STEP = 1;
+
 
     public final double DAMAGE_POINTS;
     public final int SPAWN_MIN_Y;
@@ -287,10 +289,10 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
         }
         if (momentumCurrentFrame > 0){
             setCoorY(getCoorY() + 1);
-            momentumCurrentFrame--;
+            momentumCurrentFrame = momentumCurrentFrame - COOR_Y_MOVEMENT_STEP;
         } else {
             setCoorY(getCoorY() - 1);
-            momentumCurrentFrame++;
+            momentumCurrentFrame = momentumCurrentFrame + COOR_Y_MOVEMENT_STEP;
         }
     }
 

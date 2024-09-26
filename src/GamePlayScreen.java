@@ -440,7 +440,7 @@ public class GamePlayScreen extends Screen{
 
             if (!input.isDown(Keys.UP) && !input.isDown(Keys.LEFT) && !input.isDown(Keys.RIGHT) &&
                     taxi.getCurrentPassenger() == null && p.isAdjacent(taxi.getCoorX(), taxi.getCoorY()) &&
-                    !p.getIsPickedUp()){
+                    !p.getIsPickedUp() && taxi.getHasDriver()){
                 p.incrementCoorXY(taxi.getCoorX(), taxi.getCoorY());
 
                 // A passenger is only considered picked up when they have the same coordinates as taxi
@@ -563,6 +563,11 @@ public class GamePlayScreen extends Screen{
                     currentTrip.decreasePassengerPriority();
                     currentTrip.PASSENGER.calcExpEarnings(currentTrip.PASSENGER.getYDist());
                 }
+            }
+
+            if (driver.getIsEjected() && c.hasCollided(driver)) {
+                collidedCoin = c;
+                setIsCoinActive(true);
             }
         }
 
@@ -839,10 +844,13 @@ public class GamePlayScreen extends Screen{
      */
     public void checkCollisions(){
 
+        // checks collision between car and taxi, car and driver
         for (Car c: cars){
             checkCollision(taxi, c);
+            checkCollision(c, driver);
         }
 
+        // checks collision between car and car
         for (int i = 0; i < cars.size(); i++){
             for (int j = 0; j < cars.size(); j++) {
                 if (i != j){
@@ -851,6 +859,9 @@ public class GamePlayScreen extends Screen{
                 }
             }
         }
+
+
+
     }
 
 
@@ -903,6 +914,28 @@ public class GamePlayScreen extends Screen{
         }
     }
 
+    public void checkCollision(Car car, Driver driver) {
+        double sumOfRadius = car.RADIUS + driver.RADIUS;
+        if (calcDist(car, driver) < sumOfRadius && car.getIsActive() && driver.getIsEjected()) {
+
+            if (driver.getCollisionTimeoutLeft() == 0){
+                driver.takeDamage(car);
+            }
+
+            // car is above driver
+            if (car.getCoorY() < driver.getCoorY()) {
+                car.setMomentumCurrentFrame(-Car.MOMENTUM);
+                driver.setMomentumCurrentFrame(Driver.MOMENTUM);
+            } else {
+                car.setMomentumCurrentFrame(Car.MOMENTUM);
+                driver.setMomentumCurrentFrame(-Driver.MOMENTUM);
+            }
+
+        }
+    }
+
+
+
     public static double calcDist(GameEntity gameEntity1, GameEntity gameEntity2) {
         return Math.sqrt(Math.pow(gameEntity1.getCoorX() - gameEntity2.getCoorX(), 2) + Math.pow(gameEntity1.getCoorY() - gameEntity2.getCoorY(), 2));
     }
@@ -912,6 +945,9 @@ public class GamePlayScreen extends Screen{
         for (Car c: cars){
             c.handleMomentum();
         }
+        if (driver.getIsEjected()){
+            driver.handleMomentum();
+        }
     }
 
     public void decrementCollisionTimeout(){
@@ -919,6 +955,7 @@ public class GamePlayScreen extends Screen{
         for (Car c: cars){
             c.decrementCollisionTimeoutLeft();
         }
+        driver.decrementCollisionTimeoutLeft();
     }
 
 
@@ -968,7 +1005,9 @@ public class GamePlayScreen extends Screen{
     public void assignNewTaxi(){
         if (taxi.getIsDamaged()){
             damagedTaxi = new Taxi(GAME_PROPS, taxi.getCoorX(), taxi.getCoorY(), true);
-            driver.eject(taxi.getCoorX() - Driver.EJECTION_COOR_X_MINUS, taxi.getCoorY());
+            if (!driver.getIsEjected()) {
+                driver.eject(taxi.getCoorX() - Driver.EJECTION_COOR_X_MINUS, taxi.getCoorY());
+            }
 
             int newSpawnCoorY = MiscUtils.getRandomInt(TAXI_MAX_SPAWN_MIN_Y, TAXI_MAX_SPAWN_MAX_Y + 1);
             taxi = new Taxi(GAME_PROPS, randomLaneNumber(), newSpawnCoorY, false);
@@ -1010,6 +1049,11 @@ public class GamePlayScreen extends Screen{
     public void loadDriver(){
         if (driver.getIsEjected()){
             driver.IMAGE.draw(driver.getCoorX(), driver.getCoorY());
+
+            if (driver.BLOOD.getIsActive()) {
+                driver.BLOOD.IMAGE.draw(driver.BLOOD.getCoorX(), driver.BLOOD.getCoorY());
+                driver.BLOOD.incrementCurrentFrame();
+            }
         }
     }
 
@@ -1046,17 +1090,6 @@ public class GamePlayScreen extends Screen{
     }
 
 
-
-    public boolean noKeysPressed(Input input){
-        boolean flag;
-        if (!input.isDown(Keys.UP) && !input.isDown(Keys.RIGHT) && !input.isDown(Keys.LEFT)){
-            flag = true;
-        } else {
-            flag = false;
-        }
-        return flag;
-    }
-
     public void moveTaxiDown(){
         if (damagedTaxi != null){
             damagedTaxi.moveDown();
@@ -1084,6 +1117,7 @@ public class GamePlayScreen extends Screen{
 
         if (input.isDown(Keys.DOWN)){
             driver.moveDown();
+            driver.BLOOD.moveDown();
         }
 
         if (input.isDown(Keys.LEFT)) {
@@ -1130,13 +1164,9 @@ public class GamePlayScreen extends Screen{
 
     public void decrementInvincibility(){
         taxi.getInvinciblePower().decrementFrameLeft();
-        System.out.println("taxi");
-        System.out.println(taxi.getInvinciblePower().getFrameLeft());
 
         if (driver.getIsEjected()) {
             driver.getInvinciblePower().decrementFrameLeft();
-            System.out.println("driver");
-            System.out.println(driver.getInvinciblePower().getFrameLeft());
 
         }
     }

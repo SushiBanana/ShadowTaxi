@@ -33,7 +33,6 @@ public abstract class Effect extends GameEntity{
         isActive = active;
     }
 
-
     public void moveDown(){
         setCoorY(getCoorY() - MOVE_FRAME);
     }

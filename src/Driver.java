@@ -8,6 +8,7 @@ public class Driver extends GameEntity implements Damageable{
     public final static int MOMENTUM = 10;
     public final static int MOMENTUM_COOR_Y_MINUS = 2;
     public final static int COLLISION_TIMEOUT = 200;
+    public final static int COOR_Y_MOVEMENT_STEP = 2;
 
 
     public final int MOVE_FRAME_Y;
@@ -19,7 +20,7 @@ public class Driver extends GameEntity implements Damageable{
     private double health;
     private int collisionTimeoutLeft;
     private boolean isEjected;
-    private Blood blood;
+    public Blood BLOOD;
     private int momentumCurrentFrame;
     private InvinciblePower invinciblePower;
 
@@ -37,6 +38,7 @@ public class Driver extends GameEntity implements Damageable{
         this.health = Double.parseDouble(gameProps.getProperty("gameObjects.driver.health")) * 100;
         this.isEjected = false;
         this.invinciblePower = new InvinciblePower(gameProps, coorX, coorY);
+        this.BLOOD = new Blood(gameProps, coorX, coorY);
 
     }
 
@@ -80,38 +82,75 @@ public class Driver extends GameEntity implements Damageable{
         this.invinciblePower = invinciblePower;
     }
 
+    public int getCollisionTimeoutLeft() {
+        return collisionTimeoutLeft;
+    }
+
+    public void setCollisionTimeoutLeft(int collisionTimeoutLeft) {
+        this.collisionTimeoutLeft = collisionTimeoutLeft;
+    }
+
+    public int getMomentumCurrentFrame() {
+        return momentumCurrentFrame;
+    }
+
+    public void setMomentumCurrentFrame(int momentumCurrentFrame) {
+        this.momentumCurrentFrame = momentumCurrentFrame;
+    }
+
     public void eject(int coorX, int coorY){
         setIsEjected(true);
         setCoorX(coorX);
         setCoorY(coorY);
     }
 
+    public void handleMomentum(){
+        if (momentumCurrentFrame == 0){
+            return;
+        }
+        if (momentumCurrentFrame > 0){
+            setCoorY(getCoorY() + 1);
+            momentumCurrentFrame = momentumCurrentFrame - COOR_Y_MOVEMENT_STEP;
+        } else {
+            setCoorY(getCoorY() - 1);
+            momentumCurrentFrame = momentumCurrentFrame + COOR_Y_MOVEMENT_STEP;
+        }
+    }
+
     /**
      * If health is equal or less than 0, blood is set active
      */
     public void checkHealth(){
-        return;
+        if (getHealth() <= 0){
+            activateBlood();
+        }
     }
 
-    /**
-     * Checks if driver is in taxi or if driver has overshoot window's height, which is considered a game loss
-     */
-    public void checkInTaxiOrOvershoot(){
-        return;
+
+    public void activateBlood(){
+        BLOOD.setIsActive(true);
+        BLOOD.setCoorX(getCoorX());
+        BLOOD.setCoorY(getCoorY());
     }
 
 
     @Override
     public void takeDamage(DamageDealer damageDealer) {
-        return;
+        if (getHealth() > 0 && getCollisionTimeoutLeft() == 0){
+
+            setHealth(getHealth() - damageDealer.getDamagePoints());
+            setCollisionTimeoutLeft(COLLISION_TIMEOUT);
+            checkHealth();
+
+        }
     }
 
-    public void momentumForward(){
-        return;
-    }
 
-    public void momentumBackward(){
-        return;
+
+    public void decrementCollisionTimeoutLeft(){
+        if (collisionTimeoutLeft > 0){
+            collisionTimeoutLeft--;
+        }
     }
 
     public void moveLeft() {

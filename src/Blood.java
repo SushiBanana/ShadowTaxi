@@ -12,6 +12,16 @@ public class Blood extends Effect{
 
     }
 
+    public void incrementCurrentFrame(){
+        if (getCurrentFrame() == TTL){
+            setIsActive(false);
+            return;
+        }
+
+        setCurrentFrame(getCurrentFrame() + 1);
+    }
+
+
     public String toString(){
         return "Blood\n_________\n" + "coor x: " + getCoorX() + "\ncoor y: " + getCoorY() + "\nframes left: "+
                 getCurrentFrame() + "is active: " + getIsActive();

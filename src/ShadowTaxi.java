@@ -72,7 +72,7 @@ public class ShadowTaxi extends AbstractGame {
             loadGameEndScreen(input);
         }
 
-        if(checkIfWon() || isMaxFrameReached() || checkTaxiOutOfFrame()){
+        if(checkIfWon() || isMaxFrameReached() || checkTaxiOutOfFrame() || checkHealth()){
             loadGameEndScreen(input);
         }
 
@@ -208,6 +208,20 @@ public class ShadowTaxi extends AbstractGame {
     public boolean checkTaxiOutOfFrame() {
         boolean flag;
         if (gamePlayScreen.getTaxi().isOutOfFrame() && gamePlayScreen.getDriver().getIsEjected()){
+            gamePlayScreen.setIsActive(false);
+            gameEndScreen.setIsActive(true);
+            flag = true;
+        } else {
+            flag = false;
+        }
+        return flag;
+    }
+
+
+    public boolean checkHealth(){
+        boolean flag;
+        if (gamePlayScreen.getDriver().getIsEjected() && gamePlayScreen.getDriver().getHealth() <= 0 &&
+                !gamePlayScreen.getDriver().BLOOD.getIsActive()){
             gamePlayScreen.setIsActive(false);
             gameEndScreen.setIsActive(true);
             flag = true;

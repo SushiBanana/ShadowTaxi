@@ -7,6 +7,7 @@ public abstract class Car extends GameEntity implements Damageable, DamageDealer
     public final static int CAR_COOR_Y_RAND_1 = -50;
     public final static int CAR_COOR_Y_RAND_2 = 768;
     public final static int MOMENTUM = 10;
+    public final static int COOR_Y_MOVEMENT_STEP = 1;
 
     public final int MIN_SPEED_Y;
     public final int MAX_SPEED_Y;
@@ -113,7 +114,6 @@ public abstract class Car extends GameEntity implements Damageable, DamageDealer
     }
 
     public void activateFire(){
-
         FIRE.setIsActive(true);
         FIRE.setCoorX(getCoorX());
         FIRE.setCoorY(getCoorY());
@@ -142,10 +142,10 @@ public abstract class Car extends GameEntity implements Damageable, DamageDealer
         }
         if (momentumCurrentFrame > 0){
             setCoorY(getCoorY() + 1);
-            momentumCurrentFrame--;
+            momentumCurrentFrame = momentumCurrentFrame - COOR_Y_MOVEMENT_STEP;
         } else {
             setCoorY(getCoorY() - 1);
-            momentumCurrentFrame++;
+            momentumCurrentFrame = momentumCurrentFrame + COOR_Y_MOVEMENT_STEP;
         }
     }
 
