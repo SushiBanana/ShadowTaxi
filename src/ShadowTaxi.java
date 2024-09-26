@@ -72,7 +72,7 @@ public class ShadowTaxi extends AbstractGame {
             loadGameEndScreen(input);
         }
 
-        if(checkIfWon() || isMaxFrameReached()){
+        if(checkIfWon() || isMaxFrameReached() || checkTaxiOutOfFrame()){
             loadGameEndScreen(input);
         }
 
@@ -203,6 +203,18 @@ public class ShadowTaxi extends AbstractGame {
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public boolean checkTaxiOutOfFrame() {
+        boolean flag;
+        if (gamePlayScreen.getTaxi().isOutOfFrame() && gamePlayScreen.getDriver().getIsEjected()){
+            gamePlayScreen.setIsActive(false);
+            gameEndScreen.setIsActive(true);
+            flag = true;
+        } else {
+            flag = false;
+        }
+        return flag;
     }
 
 }

@@ -242,6 +242,22 @@ public class GamePlayScreen extends Screen{
         isCoinActive = coinActive;
     }
 
+    public Taxi getTaxi() {
+        return taxi;
+    }
+
+    public void setTaxi(Taxi taxi) {
+        this.taxi = taxi;
+    }
+
+    public Driver getDriver() {
+        return driver;
+    }
+
+    public void setDriver(Driver driver) {
+        this.driver = driver;
+    }
+
     /**
      * Renders the game play screen and updates attributes based on user's input
      * @param input keyboard input
@@ -276,26 +292,12 @@ public class GamePlayScreen extends Screen{
         decrementCollisionTimeout();
 
         handleAllMomentum();
+        collideInvinciblePowers(invinciblePowers);
+        decrementInvincibility();
 
 
-        if (input.isDown(Keys.UP)) {
-
-            moveScreenDown();
-            movePassengersDown(passengers);
-            moveCoinsDown(coins);
-            incrementDistTravelled();
-            moveInvinciblePowersDown(invinciblePowers);
-            moveTaxiDown();
-
-        }
-
-        if (input.isDown(Keys.LEFT)) {
-            taxi.moveLeft();
-        }
-
-        if (input.isDown(Keys.RIGHT)) {
-            taxi.moveRight();
-        }
+        handleDriverMovement(input);
+        handleInput(input);
     }
 
     /**
@@ -855,11 +857,15 @@ public class GamePlayScreen extends Screen{
     public void checkCollision(Taxi taxi, Car car){
         double sumOfRadius = taxi.RADIUS + car.RADIUS;
 
-        if (taxi.calcDist(car.getCoorX(), car.getCoorY()) < sumOfRadius && car.getIsActive() &&
-                taxi.getCollisionTimeoutLeft() == 0) {
+        if (taxi.calcDist(car.getCoorX(), car.getCoorY()) < sumOfRadius && car.getIsActive()) {
 
-            taxi.takeDamage(car);
-            car.takeDamage(taxi);
+            if (taxi.getCollisionTimeoutLeft() == 0 && taxi.getInvinciblePower().getFrameLeft() == 0) {
+                taxi.takeDamage(car);
+            }
+
+            if (car.getCollisionTimeoutLeft() == 0){
+                car.takeDamage(taxi);
+            }
 
             // taxi is above car
             if (taxi.getCoorY() < car.getCoorY()) {
@@ -875,13 +881,15 @@ public class GamePlayScreen extends Screen{
 
     public void checkCollision(Car car1, Car car2) {
         double sumOfRadius = car1.RADIUS + car2.RADIUS;
-        if (calcDist(car1, car2) < sumOfRadius && car1.getIsActive() && car2.getIsActive() && car1.getCollisionTimeoutLeft() == 0 && car2.getCollisionTimeoutLeft() == 0) {
+        if (calcDist(car1, car2) < sumOfRadius && car1.getIsActive() && car2.getIsActive()) {
 
-            car1.takeDamage(car2);
-            car2.takeDamage(car1);
+            if (car1.getCollisionTimeoutLeft() == 0) {
+                car1.takeDamage(car2);
+            }
 
-            System.out.println(car1);
-            System.out.println(car2);
+            if (car2.getCollisionTimeoutLeft() == 0){
+                car2.takeDamage(car1);
+            }
 
             // car1 is above car2
             if (car1.getCoorY() < car2.getCoorY()) {
@@ -895,7 +903,7 @@ public class GamePlayScreen extends Screen{
         }
     }
 
-    public double calcDist(GameEntity gameEntity1, GameEntity gameEntity2) {
+    public static double calcDist(GameEntity gameEntity1, GameEntity gameEntity2) {
         return Math.sqrt(Math.pow(gameEntity1.getCoorX() - gameEntity2.getCoorX(), 2) + Math.pow(gameEntity1.getCoorY() - gameEntity2.getCoorY(), 2));
     }
 
@@ -942,8 +950,16 @@ public class GamePlayScreen extends Screen{
     /**
      * Handles the collisions of different GameEntity with Invincible Powers
      */
-    public void collideInvinciblePowers(){
-        return;
+    public void collideInvinciblePowers(InvinciblePower[] invinciblePowers){
+        for (InvinciblePower i: invinciblePowers){
+            if (i.hasCollided(taxi)) {
+                taxi.setInvinciblePower(i);
+            }
+
+            if (driver.getIsEjected() && i.hasCollided(driver)) {
+                driver.setInvinciblePower(i);
+            }
+        }
     }
 
     /**
@@ -952,9 +968,11 @@ public class GamePlayScreen extends Screen{
     public void assignNewTaxi(){
         if (taxi.getIsDamaged()){
             damagedTaxi = new Taxi(GAME_PROPS, taxi.getCoorX(), taxi.getCoorY(), true);
+            driver.eject(taxi.getCoorX() - Driver.EJECTION_COOR_X_MINUS, taxi.getCoorY());
 
             int newSpawnCoorY = MiscUtils.getRandomInt(TAXI_MAX_SPAWN_MIN_Y, TAXI_MAX_SPAWN_MAX_Y + 1);
             taxi = new Taxi(GAME_PROPS, randomLaneNumber(), newSpawnCoorY, false);
+            taxi.setHasDriver(false);
         }
     }
 
@@ -1014,7 +1032,8 @@ public class GamePlayScreen extends Screen{
 
 
     public void moveCars(ArrayList<Car> cars, Input input){
-        if (input.isDown(Keys.UP)){
+
+        if (input.isDown(Keys.UP) && !driver.getIsEjected()){
             for (Car c: cars){
                 c.moveRelativeToTaxi();
             }
@@ -1048,7 +1067,85 @@ public class GamePlayScreen extends Screen{
         }
     }
 
-    // once taxi is damaged, driver gets ejected, and movement input is given to driver
+    public void handleDriverMovement(Input input){
+        if (!driver.getIsEjected()) {
+            return;
+        }
+
+        if (input.isDown(Keys.UP)) {
+            moveScreenDown();
+            movePassengersDown(passengers);
+            moveCoinsDown(coins);
+            moveInvinciblePowersDown(invinciblePowers);
+            moveTaxiDown();
+            driver.moveUp();
+
+        }
+
+        if (input.isDown(Keys.DOWN)){
+            driver.moveDown();
+        }
+
+        if (input.isDown(Keys.LEFT)) {
+            driver.moveLeft();
+        }
+
+        if (input.isDown(Keys.RIGHT)) {
+            driver.moveRight();
+        }
+        checkDriverInTaxi();
+    }
+
+    public void handleInput(Input input) {
+        if (driver.getIsEjected()){
+            return;
+        }
+
+        if (input.isDown(Keys.UP)) {
+
+            moveScreenDown();
+            movePassengersDown(passengers);
+            moveCoinsDown(coins);
+            incrementDistTravelled();
+            moveInvinciblePowersDown(invinciblePowers);
+            moveTaxiDown();
+
+        }
+
+        if (input.isDown(Keys.LEFT)) {
+            taxi.moveLeft();
+        }
+
+        if (input.isDown(Keys.RIGHT)) {
+            taxi.moveRight();
+        }
+    }
+
+    public void checkDriverInTaxi() {
+        if (calcDist(driver, taxi) <= driver.TAXI_GET_IN_RADIUS){
+            driver.setIsEjected(false);
+            taxi.setHasDriver(true);
+        }
+    }
+
+    public void decrementInvincibility(){
+        taxi.getInvinciblePower().decrementFrameLeft();
+        System.out.println("taxi");
+        System.out.println(taxi.getInvinciblePower().getFrameLeft());
+
+        if (driver.getIsEjected()) {
+            driver.getInvinciblePower().decrementFrameLeft();
+            System.out.println("driver");
+            System.out.println(driver.getInvinciblePower().getFrameLeft());
+
+        }
+    }
+
+    // passenger getting on and off which taxi, passenger can only board when driver is in taxi, passenger ejection
+    // driver blood, picking up coins
+
+
+
 
 
 

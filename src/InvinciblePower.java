@@ -10,7 +10,7 @@ public class InvinciblePower extends GameEntity{
     public final int MAX_FRAMES;
 
     private boolean isCollided;
-    private int currentFrame;
+    private int frameLeft;
 
     public InvinciblePower(Properties gameProps, int coorX, int coorY){
         super(gameProps, coorX, coorY);
@@ -19,7 +19,7 @@ public class InvinciblePower extends GameEntity{
         this.MAX_FRAMES = Integer.parseInt(gameProps.getProperty("gameObjects.invinciblePower.maxFrames"));
 
         this.isCollided = false;
-        this.currentFrame = 0;
+        this.frameLeft = 0;
     }
 
     public boolean getIsCollided() {
@@ -30,12 +30,12 @@ public class InvinciblePower extends GameEntity{
         isCollided = collided;
     }
 
-    public int getCurrentFrame() {
-        return currentFrame;
+    public int getFrameLeft() {
+        return frameLeft;
     }
 
-    public void setCurrentFrame(int currentFrame) {
-        this.currentFrame = currentFrame;
+    public void setFrameLeft(int frameLeft) {
+        this.frameLeft = frameLeft;
     }
 
     public void moveDown(){
@@ -43,11 +43,29 @@ public class InvinciblePower extends GameEntity{
     }
 
     public boolean hasCollided(Taxi taxi){
+        double sumOfRadius = RADIUS + taxi.RADIUS;
+        if (GamePlayScreen.calcDist(this, taxi) < sumOfRadius) {
+            frameLeft = MAX_FRAMES;
+            setIsCollided(true);
+            return true;
+        }
         return false;
     }
 
     public boolean hasCollided(Driver driver){
+        double sumOfRadius = RADIUS + driver.RADIUS;
+        if (GamePlayScreen.calcDist(this, driver) < sumOfRadius) {
+            frameLeft = MAX_FRAMES;
+            setIsCollided(true);
+            return true;
+        }
         return false;
+    }
+
+    public void decrementFrameLeft(){
+        if (frameLeft > 0){
+            frameLeft--;
+        }
     }
 
     public String toString(){

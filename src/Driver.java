@@ -10,6 +10,7 @@ public class Driver extends GameEntity implements Damageable{
     public final static int COLLISION_TIMEOUT = 200;
 
 
+    public final int MOVE_FRAME_Y;
     public final int WALK_SPEED_X;
     public final int WALK_SPEED_Y;
     public final int RADIUS;
@@ -17,10 +18,10 @@ public class Driver extends GameEntity implements Damageable{
 
     private double health;
     private int collisionTimeoutLeft;
-    private boolean isActive;
     private boolean isEjected;
     private Blood blood;
     private int momentumCurrentFrame;
+    private InvinciblePower invinciblePower;
 
     public Driver(Properties gameProps, int coorX, int coorY){
         super(gameProps, coorX, coorY);
@@ -30,10 +31,13 @@ public class Driver extends GameEntity implements Damageable{
         this.WALK_SPEED_Y = Integer.parseInt(gameProps.getProperty("gameObjects.driver.walkSpeedY"));
         this.RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.driver.radius"));
         this.TAXI_GET_IN_RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.driver.taxiGetInRadius"));
+        this.MOVE_FRAME_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.speedY"));
 
-        this.health = (double) (Double.parseDouble(gameProps.getProperty("gameObjects.driver.health")) * 100);
-        this.isActive = false;
+
+        this.health = Double.parseDouble(gameProps.getProperty("gameObjects.driver.health")) * 100;
         this.isEjected = false;
+        this.invinciblePower = new InvinciblePower(gameProps, coorX, coorY);
+
     }
 
     /**
@@ -68,8 +72,18 @@ public class Driver extends GameEntity implements Damageable{
         isEjected = ejected;
     }
 
-    public void eject(){
-        return;
+    public InvinciblePower getInvinciblePower() {
+        return invinciblePower;
+    }
+
+    public void setInvinciblePower(InvinciblePower invinciblePower) {
+        this.invinciblePower = invinciblePower;
+    }
+
+    public void eject(int coorX, int coorY){
+        setIsEjected(true);
+        setCoorX(coorX);
+        setCoorY(coorY);
     }
 
     /**
@@ -100,7 +114,30 @@ public class Driver extends GameEntity implements Damageable{
         return;
     }
 
+    public void moveLeft() {
+        setCoorX(getCoorX() - WALK_SPEED_X);
+    }
+
+    public void moveRight() {
+        setCoorX(getCoorX() + WALK_SPEED_X);
+    }
+
+    public void moveUp() {
+        setCoorY(getCoorY() - WALK_SPEED_Y);
+    }
+
+    public void moveDown() {
+        setCoorY(getCoorY() + WALK_SPEED_Y);
+    }
+
+    public void moveWithTaxi() {
+        setCoorY(getCoorY() - MOVE_FRAME_Y);
+    }
+
+
+
+
     public String toString(){
-        return "DRIVER\n________\nis active:" + isActive + "coor x: " + getCoorX() + "coor y: " + getCoorY();
+        return "DRIVER\n________\nis ejected:" + isEjected + "\ncoor x: " + getCoorX() + "\ncoor y: " + getCoorY();
     }
 }

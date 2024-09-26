@@ -21,6 +21,7 @@ public abstract class Car extends GameEntity implements Damageable, DamageDealer
     private double health;
     private int momentumCurrentFrame;
     private int collisionTimeoutLeft;
+    private int invincibilityLeft;
 
 
     private boolean isActive;

@@ -1,4 +1,6 @@
 import bagel.Image;
+import bagel.Window;
+
 import java.util.Properties;
 
 /**
@@ -30,6 +32,7 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
     private int momentumCurrentFrame;
     private boolean isDamaged;
     private boolean hasDriver;
+    private InvinciblePower invinciblePower;
 
 
     /**
@@ -66,6 +69,7 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
 
         this.FIRE = new Fire(gameProps, coorX, coorY);
         this.SMOKE = new Smoke(gameProps, coorX, coorY);
+        this.invinciblePower = new InvinciblePower(gameProps, coorX, coorY);
 
     }
 
@@ -131,6 +135,14 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
 
     public void setMomentumCurrentFrame(int momentumCurrentFrame) {
         this.momentumCurrentFrame = momentumCurrentFrame;
+    }
+
+    public InvinciblePower getInvinciblePower() {
+        return invinciblePower;
+    }
+
+    public void setInvinciblePower(InvinciblePower invinciblePower) {
+        this.invinciblePower = invinciblePower;
     }
 
     /**
@@ -281,6 +293,18 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
             momentumCurrentFrame++;
         }
     }
+
+    public boolean isOutOfFrame() {
+        boolean flag;
+        if (getCoorY() >= Window.getHeight()) {
+            flag = true;
+        } else {
+            flag = false;
+        }
+        return flag;
+
+    }
+
 
 
 }
