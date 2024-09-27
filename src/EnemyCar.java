@@ -15,10 +15,6 @@ public class EnemyCar extends Car{
 
     }
 
-    @Override
-    public void dealDamage(Damageable damageable) {
-        return;
-    }
 
     @Override
     public void takeDamage(DamageDealer damageDealer) {

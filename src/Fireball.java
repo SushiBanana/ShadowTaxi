@@ -39,10 +39,6 @@ public class Fireball extends GameEntity implements DamageDealer{
         return "FIREBALL\n____________\n" + "coor x: " + getCoorX() + "coor y: "  + getCoorY();
     }
 
-    @Override
-    public void dealDamage(Damageable damageable) {
-        return;
-    }
 
     @Override
     public double getDamagePoints() {

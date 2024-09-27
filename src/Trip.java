@@ -192,7 +192,7 @@ public class Trip {
     public double calcPriorityFee(){
         int rate;
 
-        switch (PASSENGER.getPriority()){
+        switch (PASSENGER.getCurrentPriority()){
             case 1:
                 rate = RATE_PRIORITY_1;
                 break;
@@ -212,7 +212,7 @@ public class Trip {
                 rate = 0;
         }
 
-        this.priorityFee = PASSENGER.getPriority() * rate;
+        this.priorityFee = PASSENGER.getCurrentPriority() * rate;
         return priorityFee;
     }
 
@@ -226,10 +226,10 @@ public class Trip {
     }
 
     /**
-     * Decreases the trip passenger's priority only if it has never been decreased before
+     * Decreases the trip passenger's current and original priority only if it has never been decreased before
      */
     public void decreasePassengerPriority(){
-        if (hasPriorityDecreased || PASSENGER.getPriority() <= 1){
+        if (hasPriorityDecreased || PASSENGER.getCurrentPriority() <= 1){
             return;
         }
 

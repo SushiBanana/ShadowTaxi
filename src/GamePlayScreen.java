@@ -401,8 +401,13 @@ public class GamePlayScreen extends Screen{
      */
     public void loadPassengers(Passenger[] passengers){
 
-
         for (Passenger p: passengers){
+
+            if (isRaining){
+                p.changePriorityWhenRaining();
+            } else {
+                p.revertPriorityWhenSunny();
+            }
 
             if(!p.getIsPickedUp() || p.isDroppedOff() || p.getIsEjected()){
 
@@ -430,7 +435,7 @@ public class GamePlayScreen extends Screen{
             return;
         }
 
-        String priority = Integer.toString(p.getPriority());
+        String priority = Integer.toString(p.getCurrentPriority());
 
         loadFont(FONT_FILE, priority, PASSENGER_FONT_SIZE, p.getCoorX() - PRIORITY_GAP, p.getCoorY());
     }
@@ -456,7 +461,6 @@ public class GamePlayScreen extends Screen{
                     p.setIsPickedUp(true);
                     p.TRIP_END_FLAG.setIsVisible(true);
                     taxi.setCurrentPassenger(p);
-                    System.out.println("new trip started");
                     currentTrip = new Trip(GAME_PROPS, MESSAGE_PROPS, taxi.getCurrentPassenger(), taxi);
 
                     /*
@@ -556,7 +560,7 @@ public class GamePlayScreen extends Screen{
     }
 
     /**
-     * Collides coin with taxi
+     * Collides coin with taxi and driver
      * @param coins array of Coin objects
      */
     public void collideCoins(Coin[] coins){
@@ -564,22 +568,29 @@ public class GamePlayScreen extends Screen{
             if (c.hasCollided(taxi)){
                 collidedCoin = c;
                 setIsCoinActive(true);
-                /*
-                Decreases current trip's passenger's priority only if there is a current trip, and updates passenger's
-                earnings to reflect this change
-                 */
-                if (currentTrip != null){
-                    currentTrip.decreasePassengerPriority();
-                    currentTrip.PASSENGER.calcExpEarnings(currentTrip.PASSENGER.getYDist());
-                }
+
+                handlePriorityDecrement();
             }
 
             if (driver.getIsEjected() && c.hasCollided(driver)) {
                 collidedCoin = c;
                 setIsCoinActive(true);
+
+                handlePriorityDecrement();
             }
         }
 
+    }
+
+    /**
+     * Decreases current trip's passenger's priority only if there is a current trip, and updates passenger' earnings
+     * to reflect this change
+     */
+    public void handlePriorityDecrement(){
+        if (currentTrip != null){
+            currentTrip.decreasePassengerPriority();
+            currentTrip.PASSENGER.calcExpEarnings(currentTrip.PASSENGER.getYDist());
+        }
     }
 
     /**
@@ -651,7 +662,6 @@ public class GamePlayScreen extends Screen{
                 taxi.setCurrentPassenger(null);
                 increaseScore(currentTrip.getEarnings());
                 lastTrip = currentTrip;
-                System.out.println("current Trip null");
                 currentTrip = null;
             }
         }
@@ -690,7 +700,7 @@ public class GamePlayScreen extends Screen{
                     currentTrip.TRIP_INFO_COOR_Y);
             loadFont(FONT_FILE, currentTrip.EXP_FEE_WORD + expFee, INFO_FONT_SIZE,
                     currentTrip.TRIP_INFO_COOR_X, currentTrip.TRIP_INFO_COOR_Y + Trip.INFO_GAP);
-            loadFont(FONT_FILE, currentTrip.PRIORITY_WORD + currentTrip.PASSENGER.getPriority(),
+            loadFont(FONT_FILE, currentTrip.PRIORITY_WORD + currentTrip.PASSENGER.getCurrentPriority(),
                     INFO_FONT_SIZE, currentTrip.TRIP_INFO_COOR_X,
                     currentTrip.TRIP_INFO_COOR_Y + (Trip.INFO_GAP * 2));
 
@@ -702,7 +712,7 @@ public class GamePlayScreen extends Screen{
                     lastTrip.TRIP_INFO_COOR_Y);
             loadFont(FONT_FILE, lastTrip.EXP_FEE_WORD + expFee, INFO_FONT_SIZE, lastTrip.TRIP_INFO_COOR_X,
                     lastTrip.TRIP_INFO_COOR_Y + Trip.INFO_GAP);
-            loadFont(FONT_FILE, lastTrip.PRIORITY_WORD + lastTrip.PASSENGER.getPriority(), INFO_FONT_SIZE,
+            loadFont(FONT_FILE, lastTrip.PRIORITY_WORD + lastTrip.PASSENGER.getCurrentPriority(), INFO_FONT_SIZE,
                     lastTrip.TRIP_INFO_COOR_X, lastTrip.TRIP_INFO_COOR_Y + (Trip.INFO_GAP * 2));
             loadFont(FONT_FILE, lastTrip.PENALTY_WORD + penalty, INFO_FONT_SIZE,
                     lastTrip.TRIP_INFO_COOR_X, lastTrip.TRIP_INFO_COOR_Y + (Trip.INFO_GAP * 3));
@@ -862,6 +872,7 @@ public class GamePlayScreen extends Screen{
             checkCollision(taxi, c);
             checkCollision(c, driver);
 
+            // checks collision between each car and every other passenger
             for (Passenger p: passengers){
                 checkCollision(c, p);
 

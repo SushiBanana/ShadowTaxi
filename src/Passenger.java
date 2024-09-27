@@ -19,7 +19,8 @@ public class Passenger extends GameEntity implements Damageable{
     public final int RATE_PRIORITY_3;
     public final Blood BLOOD;
 
-    private int priority;
+    private int currentPriority;
+    private int originalPriority;
     private int endCoorX;
     private int yDist;
     private double earnings;
@@ -41,8 +42,7 @@ public class Passenger extends GameEntity implements Damageable{
     private boolean isEjected;
     private int collisionTimeoutLeft;
     private int momentumCurrentFrame;
-
-
+    private int rainPriority;
 
     /**
      * Constructor for Passenger class
@@ -66,7 +66,8 @@ public class Passenger extends GameEntity implements Damageable{
         this.RATE_PRIORITY_2 = Integer.parseInt(gameProps.getProperty("trip.rate.priority2"));
         this.RATE_PRIORITY_3 = Integer.parseInt(gameProps.getProperty("trip.rate.priority3"));
 
-        this.priority = priority;
+        this.currentPriority = priority;
+        this.originalPriority = priority;
         this.endCoorX = endCoorX;
         this.yDist = yDist;
         this.earnings = calcExpEarnings(yDist);
@@ -88,16 +89,16 @@ public class Passenger extends GameEntity implements Damageable{
      * Getter method for passenger's priority
      * @return integer of passenger's priority
      */
-    public int getPriority() {
-        return priority;
+    public int getCurrentPriority() {
+        return currentPriority;
     }
 
     /**
      * Setter method for passenger's priority
-     * @param priority integer of passenger's new priority
+     * @param currentPriority integer of passenger's new priority
      */
-    public void setPriority(int priority) {
-        this.priority = priority;
+    public void setCurrentPriority(int currentPriority) {
+        this.currentPriority = currentPriority;
     }
 
     /**
@@ -335,10 +336,11 @@ public class Passenger extends GameEntity implements Damageable{
      * Decrements passenger's priority
      */
     public void decrementPriority(){
-        if (priority < 1){
+        if (currentPriority < 1 || originalPriority < 1){
             return;
         }
-        priority--;
+        currentPriority--;
+        originalPriority--;
     }
 
     /**
@@ -350,7 +352,7 @@ public class Passenger extends GameEntity implements Damageable{
         int rate;
         double res;
 
-        switch (priority) {
+        switch (currentPriority) {
             case 1:
                 rate = RATE_PRIORITY_1;
                 break;
@@ -370,7 +372,7 @@ public class Passenger extends GameEntity implements Damageable{
                 break;
 
         }
-        res = yDist * RATE_PER_Y + priority * rate;
+        res = yDist * RATE_PER_Y + currentPriority * rate;
         this.earnings = res;
         return res;
     }
@@ -382,7 +384,7 @@ public class Passenger extends GameEntity implements Damageable{
     public String toString(){
         return "Passenger\n" + "_____________\n" + "IMAGE: " + IMAGE + "\nx-coordinate: " + getCoorX() + "\n" +"y" +
                 "-coordinate: " + getCoorY() + "\n" +
-                "priority: " + priority + "\n" + TRIP_END_FLAG +
+                "current priority: " + currentPriority + "\n" + TRIP_END_FLAG +
                 "has umbrella: " + hasUmbrella +
                 "\nis ejected: " + isEjected +
                 "\nis picked up: " + isPickedUp +
@@ -454,5 +456,15 @@ public class Passenger extends GameEntity implements Damageable{
             checkHealth();
 
         }
+    }
+
+    public void changePriorityWhenRaining(){
+        if (!hasUmbrella){
+            currentPriority = 1;
+        }
+    }
+
+    public void revertPriorityWhenSunny(){
+        currentPriority = originalPriority;
     }
 }

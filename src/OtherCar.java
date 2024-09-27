@@ -21,11 +21,6 @@ public class OtherCar extends Car{
     }
 
     @Override
-    public void dealDamage(Damageable damageable) {
-        return;
-    }
-
-    @Override
     public void takeDamage(DamageDealer damageDealer) {
         if (getHealth() > 0 && getCollisionTimeoutLeft() == 0){
             setNewRandomMoveFrame();

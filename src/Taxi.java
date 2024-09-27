@@ -256,15 +256,6 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
 
     }
 
-    /**
-     * Taxi can only deal damage if its coordinates and other entities' coordinates is less than sum of radius of both
-     * @param damageable GameEntity object that damage gets done on
-     */
-    @Override
-    public void dealDamage(Damageable damageable) {
-        return;
-    }
-
     @Override
     public double getDamagePoints() {
         return DAMAGE_POINTS;
