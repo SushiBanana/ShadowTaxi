@@ -17,6 +17,7 @@ public class Passenger extends GameEntity implements Damageable{
     public final int RATE_PRIORITY_1;
     public final int RATE_PRIORITY_2;
     public final int RATE_PRIORITY_3;
+    public final Blood BLOOD;
 
     private int priority;
     private int endCoorX;
@@ -28,7 +29,7 @@ public class Passenger extends GameEntity implements Damageable{
     //
     public final static int EJECTION_COOR_X_MINUS = 100;
     public static final int MOMENTUM = 10;
-    public final static int MOMENTUM_COOR_Y_MINUS = 2;
+    public final static int COOR_Y_MOVEMENT_STEP = 2;
     public final static int COLLISION_TIMEOUT = 200;
 
 
@@ -37,8 +38,11 @@ public class Passenger extends GameEntity implements Damageable{
 
     private double health;
     private boolean hasUmbrella;
-    private Blood blood;
     private boolean isEjected;
+    private int collisionTimeoutLeft;
+    private int momentumCurrentFrame;
+
+
 
     /**
      * Constructor for Passenger class
@@ -75,7 +79,8 @@ public class Passenger extends GameEntity implements Damageable{
 
         this.RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.passenger.radius"));
         this.TAXI_GET_IN_RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.passenger.taxiGetInRadius"));
-        this.health = (double) (Double.parseDouble(gameProps.getProperty("gameObjects.passenger.health")) * 100);
+        this.health = Double.parseDouble(gameProps.getProperty("gameObjects.passenger.health")) * 100;
+        this.BLOOD = new Blood (gameProps, getCoorX(), getCoorY());
 
     }
 
@@ -191,6 +196,7 @@ public class Passenger extends GameEntity implements Damageable{
         this.health = health;
     }
 
+
     /**
      * Moves passenger and passenger's trip end flag by incrementing its y-coordinates based on MOVE_FRAME
      */
@@ -267,10 +273,34 @@ public class Passenger extends GameEntity implements Damageable{
 
     /**
      * Setter method for whether passenger is dropped off
-     * @param droppedOff boolean of whether passenger is dropped off
+     * @param isDroppedOff boolean of whether passenger is dropped off
      */
-    public void setIsDroppedOff(boolean droppedOff) {
-        isDroppedOff = droppedOff;
+    public void setIsDroppedOff(boolean isDroppedOff) {
+        this.isDroppedOff = isDroppedOff;
+    }
+
+    public boolean getIsEjected() {
+        return isEjected;
+    }
+
+    public void setIsEjected(boolean isEjected) {
+        this.isEjected = isEjected;
+    }
+
+    public int getCollisionTimeoutLeft() {
+        return collisionTimeoutLeft;
+    }
+
+    public void setCollisionTimeoutLeft(int collisionTimeoutLeft) {
+        this.collisionTimeoutLeft = collisionTimeoutLeft;
+    }
+
+    public int getMomentumCurrentFrame() {
+        return momentumCurrentFrame;
+    }
+
+    public void setMomentumCurrentFrame(int momentumCurrentFrame) {
+        this.momentumCurrentFrame = momentumCurrentFrame;
     }
 
     /**
@@ -290,9 +320,8 @@ public class Passenger extends GameEntity implements Damageable{
 
         } else if (getCoorX() > TRIP_END_FLAG.getCoorX()){
             setCoorX(getCoorX() - WALK_SPEED_X);
-        }
 
-        if (getCoorY() < TRIP_END_FLAG.getCoorY()){
+        } else if (getCoorY() < TRIP_END_FLAG.getCoorY()){
             setCoorY(getCoorY() + WALK_SPEED_Y);
 
         } else if (getCoorY() > TRIP_END_FLAG.getCoorY()){
@@ -354,26 +383,76 @@ public class Passenger extends GameEntity implements Damageable{
         return "Passenger\n" + "_____________\n" + "IMAGE: " + IMAGE + "\nx-coordinate: " + getCoorX() + "\n" +"y" +
                 "-coordinate: " + getCoorY() + "\n" +
                 "priority: " + priority + "\n" + TRIP_END_FLAG +
-                "has umbrella: " + hasUmbrella;
+                "has umbrella: " + hasUmbrella +
+                "\nis ejected: " + isEjected +
+                "\nis picked up: " + isPickedUp +
+                "\nis dropped off: " + isDroppedOff+
+                "\nmomentum current frame: " + momentumCurrentFrame;
     }
 
-    public void eject(){
-        return;
+    public void eject(int coorX, int coorY){
+        setIsEjected(true);
+        setCoorX(coorX);
+        setCoorY(coorY);
     }
 
     public void followDriver(Driver driver){
-        return;
+        if (getCoorX() < driver.getCoorX()){
+            setCoorX(getCoorX() + WALK_SPEED_X);
+
+        } else if (getCoorX() > driver.getCoorX()){
+            setCoorX(getCoorX() - WALK_SPEED_X);
+
+        } else if (getCoorY() < driver.getCoorY()){
+            setCoorY(getCoorY() + WALK_SPEED_Y);
+
+        } else if (getCoorY() > driver.getCoorY()){
+            setCoorY(getCoorY() - WALK_SPEED_Y);
+
+        }
+
     }
 
-    /**
-     * If health is equal or less than 0, blood is set active
-     */
-    public void checkHealth(){
+    public void handleMomentum(){
+        if (momentumCurrentFrame == 0){
+            return;
+        }
+        if (momentumCurrentFrame > 0){
+            setCoorY(getCoorY() + 1);
+            momentumCurrentFrame = momentumCurrentFrame - COOR_Y_MOVEMENT_STEP;
+        } else {
+            setCoorY(getCoorY() - 1);
+            momentumCurrentFrame = momentumCurrentFrame + COOR_Y_MOVEMENT_STEP;
+        }
+    }
 
+    public void decrementCollisionTimeoutLeft(){
+        if (collisionTimeoutLeft > 0){
+            collisionTimeoutLeft--;
+        }
+    }
+
+    public void checkHealth(){
+        if (getHealth() <= 0){
+            activateBlood();
+        }
+    }
+
+
+    public void activateBlood(){
+        BLOOD.setIsActive(true);
+        BLOOD.setCoorX(getCoorX());
+        BLOOD.setCoorY(getCoorY());
     }
 
     @Override
     public void takeDamage(DamageDealer damageDealer) {
+        if (getHealth() > 0 && getCollisionTimeoutLeft() == 0){
 
+            setHealth(getHealth() - damageDealer.getDamagePoints());
+            setCollisionTimeoutLeft(COLLISION_TIMEOUT);
+            checkHealth();
+
+        }
     }
 }

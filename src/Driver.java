@@ -20,7 +20,7 @@ public class Driver extends GameEntity implements Damageable{
     private double health;
     private int collisionTimeoutLeft;
     private boolean isEjected;
-    public Blood BLOOD;
+    public final Blood BLOOD;
     private int momentumCurrentFrame;
     private InvinciblePower invinciblePower;
 
