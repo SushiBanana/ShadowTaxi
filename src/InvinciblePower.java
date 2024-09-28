@@ -4,7 +4,7 @@ import java.util.Properties;
 
 public class InvinciblePower extends GameEntity{
 
-    public final static int MOVE_FRAME = 5;
+    public final int TAXI_MOVE_FRAME_Y;
 
     public final double RADIUS;
     public final int MAX_FRAMES;
@@ -17,6 +17,8 @@ public class InvinciblePower extends GameEntity{
         this.IMAGE = new Image(gameProps.getProperty("gameObjects.invinciblePower.image"));
         this.RADIUS = Double.parseDouble(gameProps.getProperty("gameObjects.invinciblePower.radius"));
         this.MAX_FRAMES = Integer.parseInt(gameProps.getProperty("gameObjects.invinciblePower.maxFrames"));
+        this.TAXI_MOVE_FRAME_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.speedY"));
+
 
         this.isCollided = false;
         this.frameLeft = 0;
@@ -39,7 +41,7 @@ public class InvinciblePower extends GameEntity{
     }
 
     public void moveDown(){
-        setCoorY(getCoorY() + MOVE_FRAME);
+        setCoorY(getCoorY() + TAXI_MOVE_FRAME_Y);
     }
 
     public boolean hasCollided(Taxi taxi){

@@ -11,7 +11,7 @@ public class Driver extends GameEntity implements Damageable{
     public final static int COOR_Y_MOVEMENT_STEP = 2;
 
 
-    public final int MOVE_FRAME_Y;
+    public final int TAXI_MOVE_FRAME_Y;
     public final int WALK_SPEED_X;
     public final int WALK_SPEED_Y;
     public final int RADIUS;
@@ -32,7 +32,7 @@ public class Driver extends GameEntity implements Damageable{
         this.WALK_SPEED_Y = Integer.parseInt(gameProps.getProperty("gameObjects.driver.walkSpeedY"));
         this.RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.driver.radius"));
         this.TAXI_GET_IN_RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.driver.taxiGetInRadius"));
-        this.MOVE_FRAME_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.speedY"));
+        this.TAXI_MOVE_FRAME_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.speedY"));
 
 
         this.health = Double.parseDouble(gameProps.getProperty("gameObjects.driver.health")) * 100;
@@ -170,7 +170,7 @@ public class Driver extends GameEntity implements Damageable{
     }
 
     public void moveWithTaxi() {
-        setCoorY(getCoorY() - MOVE_FRAME_Y);
+        setCoorY(getCoorY() - TAXI_MOVE_FRAME_Y);
     }
 
 

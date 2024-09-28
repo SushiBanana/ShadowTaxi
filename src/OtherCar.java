@@ -24,7 +24,7 @@ public class OtherCar extends Car{
     public void takeDamage(DamageDealer damageDealer) {
         if (getHealth() > 0 && getCollisionTimeoutLeft() == 0){
             setNewRandomMoveFrame();
-            activateSmoke();
+            SMOKE.activate(getCoorX(), getCoorY());
 
             setHealth(getHealth() - damageDealer.getDamagePoints());
             setCollisionTimeoutLeft(COLLISION_TIMEOUT);

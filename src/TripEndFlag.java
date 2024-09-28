@@ -6,7 +6,7 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public class TripEndFlag extends GameEntity{
-    public final int MOVE_FRAME = 5;
+    public final int TAXI_MOVE_FRAME_Y = 5;
 
     public final int RADIUS;
 
@@ -47,7 +47,7 @@ public class TripEndFlag extends GameEntity{
      * Moves trip end flag down by incrementing its y-coordinates based on MOVE_FRAME
      */
     public void moveDown(){
-        setCoorY(getCoorY() + MOVE_FRAME);
+        setCoorY(getCoorY() + TAXI_MOVE_FRAME_Y);
     }
 
     /**

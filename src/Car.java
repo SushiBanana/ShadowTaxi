@@ -1,4 +1,3 @@
-
 import java.util.Properties;
 
 public abstract class Car extends GameEntity implements Damageable, DamageDealer{
@@ -22,7 +21,6 @@ public abstract class Car extends GameEntity implements Damageable, DamageDealer
     private double health;
     private int momentumCurrentFrame;
     private int collisionTimeoutLeft;
-    private int invincibilityLeft;
 
 
     private boolean isActive;
@@ -37,11 +35,11 @@ public abstract class Car extends GameEntity implements Damageable, DamageDealer
         this.DAMAGE_POINTS = Double.parseDouble(gameProps.getProperty("gameObjects.otherCar.damage")) * 100;
         this.NUM_TYPES = Integer.parseInt(gameProps.getProperty("gameObjects.otherCar.types"));
         this.TAXI_MOVE_FRAME_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.speedY"));
+        this.FIRE = new Fire(gameProps, coorX, coorY);
+        this.SMOKE = new Smoke(gameProps, coorX, coorY);
 
         this.health = Double.parseDouble(gameProps.getProperty("gameObjects.otherCar.health")) * 100;
         this.isActive = true;
-        this.FIRE = new Fire(gameProps, coorX, coorY);
-        this.SMOKE = new Smoke(gameProps, coorX, coorY);
 
     }
 
@@ -99,26 +97,6 @@ public abstract class Car extends GameEntity implements Damageable, DamageDealer
         setCoorY(getCoorY() - (moveFrame - TAXI_MOVE_FRAME_Y));
     }
 
-    public void momentumForward(){
-        return;
-    }
-
-    public void momentumBackward(){
-        return;
-    }
-
-    public void activateSmoke(){
-        SMOKE.setIsActive(true);
-        SMOKE.setCoorX(getCoorX());
-        SMOKE.setCoorY(getCoorY());
-    }
-
-    public void activateFire(){
-        FIRE.setIsActive(true);
-        FIRE.setCoorX(getCoorX());
-        FIRE.setCoorY(getCoorY());
-    }
-
     public double getDamagePoints(){
         return DAMAGE_POINTS;
     }
@@ -126,7 +104,7 @@ public abstract class Car extends GameEntity implements Damageable, DamageDealer
     public void checkHealth() {
         if (getHealth() <= 0){
             SMOKE.setIsActive(false);
-            activateFire();
+            FIRE.activate(getCoorX(), getCoorY());
         }
     }
 

@@ -220,8 +220,7 @@ public class ShadowTaxi extends AbstractGame {
 
     public boolean checkHealth(){
         boolean flag;
-        if (gamePlayScreen.getDriver().getIsEjected() && gamePlayScreen.getDriver().getHealth() <= 0 &&
-                !gamePlayScreen.getDriver().BLOOD.getIsActive()){
+        if (checkDriverHealth() || gamePlayScreen.findPassengerMinHealth() <= 0){
             gamePlayScreen.setIsActive(false);
             gameEndScreen.setIsActive(true);
             flag = true;
@@ -229,6 +228,11 @@ public class ShadowTaxi extends AbstractGame {
             flag = false;
         }
         return flag;
+    }
+
+    public boolean checkDriverHealth() {
+        return gamePlayScreen.getDriver().getIsEjected() && gamePlayScreen.getDriver().getHealth() <= 0 &&
+                !gamePlayScreen.getDriver().BLOOD.getIsActive();
     }
 
 }

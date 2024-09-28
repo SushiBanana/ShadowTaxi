@@ -7,7 +7,7 @@ import java.util.Properties;
  */
 public class Passenger extends GameEntity implements Damageable{
 
-    public final static int MOVE_FRAME = 5;
+    public final int TAXI_MOVE_FRAME_Y;
     
     public final TripEndFlag TRIP_END_FLAG;
     public final int ADJACENT_DIST;
@@ -82,6 +82,8 @@ public class Passenger extends GameEntity implements Damageable{
         this.TAXI_GET_IN_RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.passenger.taxiGetInRadius"));
         this.health = Double.parseDouble(gameProps.getProperty("gameObjects.passenger.health")) * 100;
         this.BLOOD = new Blood (gameProps, getCoorX(), getCoorY());
+        this.TAXI_MOVE_FRAME_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.speedY"));
+
 
     }
 
@@ -202,7 +204,7 @@ public class Passenger extends GameEntity implements Damageable{
      * Moves passenger and passenger's trip end flag by incrementing its y-coordinates based on MOVE_FRAME
      */
     public void moveDown(){
-        setCoorY(getCoorY() + MOVE_FRAME);
+        setCoorY(getCoorY() + TAXI_MOVE_FRAME_Y);
         TRIP_END_FLAG.moveDown();
     }
 

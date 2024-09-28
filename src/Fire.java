@@ -25,7 +25,11 @@ public class Fire extends Effect{
 
 
     public String toString(){
-        return "FIRE\n___________\n" + "TTL: " + TTL + "coor x: " + getCoorX() + "coor y: " + getCoorY();
+        return "FIRE\n___________" +
+                "\nTTL: " + TTL +
+                "\ncoor x: " + getCoorX() +
+                "\ncoor y: " + getCoorY()+
+                "\ncurrent frame: " + getCurrentFrame();
     }
 
 }

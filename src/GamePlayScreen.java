@@ -2,7 +2,6 @@ import bagel.Image;
 import bagel.Input;
 import bagel.Keys;
 import bagel.Window;
-
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -14,27 +13,47 @@ public class GamePlayScreen extends Screen{
 
     public static final int FRAME_SPEED = 5;
     public static final int PRIORITY_GAP = 30;
-    public static final int EARNING_GAP = 100;
     public static final int FRAME_GREATER = 1152;
-
+    public static final int NUM_LANES = 3;
+    public static final int NUM_RANDOM_Y_COOR = 2;
 
     public final Image BACKGROUND_RAIN; // new
     public final String OBJECT_FILE;
     public final String WEATHER_FILE; // new
     public final double TARGET_SCORE;
     public final int MAX_FRAMES;
+
     public final int INFO_FONT_SIZE;
     public final int PASSENGER_FONT_SIZE;
+
     public final int EARNINGS_COOR_X;
     public final int EARNINGS_COOR_Y;
     public final int TARGET_COOR_X;
     public final int TARGET_COOR_Y;
     public final int MAX_FRAMES_COOR_X;
     public final int MAX_FRAMES_COOR_Y;
+    public final int PASSENGER_HEALTH_COOR_X;
+    public final int PASSENGER_HEALTH_COOR_Y;
+    public final int DRIVER_HEALTH_COOR_X;
+    public final int DRIVER_HEALTH_COOR_Y;
+    public final int TAXI_HEALTH_COOR_X;
+    public final int TAXI_HEALTH_COOR_Y;
+
+    public final int LANE_CENTRE_1;
+    public final int LANE_CENTRE_2;
+    public final int LANE_CENTRE_3;
+
+    public final String[][] GAME_WEATHER;
+
+    public final int TAXI_MAX_SPAWN_MAX_Y;
+    public final int TAXI_MAX_SPAWN_MIN_Y;
 
     public final String PAY_WORD;
     public final String TARGET_WORD;
     public final String FRAMES_REM_WORD;
+    public final String TAXI_HEALTH_WORD;
+    public final String DRIVER_HEALTH_WORD;
+    public final String PASSENGER_HEALTH_WORD;
 
     private int bottomCoorY;
     private int topCoorY;
@@ -43,8 +62,13 @@ public class GamePlayScreen extends Screen{
     private String name;
 
     private Taxi taxi;
-    private Coin[] coins;
+    private Taxi damagedTaxi;
     private Passenger[] passengers;
+    private Passenger ejectedPassenger;
+    private ArrayList<Car> cars;
+    private Driver driver;
+    private Coin[] coins;
+    private InvinciblePower[] invinciblePowers;
 
     private Coin collidedCoin;
     private boolean isCoinActive;
@@ -52,38 +76,7 @@ public class GamePlayScreen extends Screen{
     private Trip currentTrip;
     private Trip lastTrip;
 
-    // below are new attributes
-
-
-    public static final int NUM_LANES = 3;
-    public static final int NUM_RANDOM_Y_COOR = 2;
-
-
-    public final int LANE_CENTRE_1;
-    public final int LANE_CENTRE_2;
-    public final int LANE_CENTRE_3;
-    public final int PASSENGER_HEALTH_COOR_X;
-    public final int PASSENGER_HEALTH_COOR_Y;
-    public final int DRIVER_HEALTH_COOR_X;
-    public final int DRIVER_HEALTH_COOR_Y;
-    public final int TAXI_HEALTH_COOR_X;
-    public final int TAXI_HEALTH_COOR_Y;
-    public final String[][] GAME_WEATHER;
-    public final String TAXI_HEALTH_WORD;
-    public final String DRIVER_HEALTH_WORD;
-    public final String PASSENGER_HEALTH_WORD;
-    public final int TAXI_MAX_SPAWN_MAX_Y;
-    public final int TAXI_MAX_SPAWN_MIN_Y;
-
-
-    private ArrayList<Car> cars;
-    private int randomNumber;
-    private InvinciblePower[] invinciblePowers;
     private boolean isRaining;
-    private Taxi damagedTaxi;
-    private Driver driver;
-    private Passenger ejectedPassenger;
-
 
     /**
      * Constructor for Game Play Screen class, it also initialises objects from OBJECT_FILE
@@ -107,21 +100,6 @@ public class GamePlayScreen extends Screen{
         this.TARGET_COOR_Y = Integer.parseInt(gameProps.getProperty("gamePlay.target.y"));
         this.MAX_FRAMES_COOR_X = Integer.parseInt(gameProps.getProperty("gamePlay.maxFrames.x"));
         this.MAX_FRAMES_COOR_Y = Integer.parseInt(gameProps.getProperty("gamePlay.maxFrames.y"));
-
-        this.PAY_WORD = messageProps.getProperty("gamePlay.earnings");
-        this.TARGET_WORD = messageProps.getProperty("gamePlay.target");
-        this.FRAMES_REM_WORD = messageProps.getProperty("gamePlay.remFrames");
-
-        this.bottomCoorY = (Window.getHeight() / 2);
-        this.topCoorY = -(Window.getHeight() / 2);
-        this.score = 0.0;
-        this.frameLeft = MAX_FRAMES;
-
-        this.isCoinActive = false;
-
-        initialiseClasses(IOUtils.readCommaSeparatedFile(OBJECT_FILE));
-        //
-
         this.LANE_CENTRE_1 = Integer.parseInt(gameProps.getProperty("roadLaneCenter1"));
         this.LANE_CENTRE_2 = Integer.parseInt(gameProps.getProperty("roadLaneCenter2"));
         this.LANE_CENTRE_3 = Integer.parseInt(gameProps.getProperty("roadLaneCenter3"));
@@ -131,113 +109,74 @@ public class GamePlayScreen extends Screen{
         this.DRIVER_HEALTH_COOR_Y = Integer.parseInt(gameProps.getProperty("gamePlay.driverHealth.y"));
         this.TAXI_HEALTH_COOR_X = Integer.parseInt(gameProps.getProperty("gamePlay.taxiHealth.x"));
         this.TAXI_HEALTH_COOR_Y = Integer.parseInt(gameProps.getProperty("gamePlay.taxiHealth.y"));
+        this.GAME_WEATHER = IOUtils.readCommaSeparatedFile(WEATHER_FILE);
+
         this.TAXI_HEALTH_WORD = messageProps.getProperty("gamePlay.taxiHealth");
         this.DRIVER_HEALTH_WORD = messageProps.getProperty("gamePlay.driverHealth");
         this.PASSENGER_HEALTH_WORD = messageProps.getProperty("gamePlay.passengerHealth");
+        this.PAY_WORD = messageProps.getProperty("gamePlay.earnings");
+        this.TARGET_WORD = messageProps.getProperty("gamePlay.target");
+        this.FRAMES_REM_WORD = messageProps.getProperty("gamePlay.remFrames");
+
         this.TAXI_MAX_SPAWN_MAX_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.nextSpawnMaxY"));
         this.TAXI_MAX_SPAWN_MIN_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.nextSpawnMinY"));
 
-
-        this.GAME_WEATHER = IOUtils.readCommaSeparatedFile(WEATHER_FILE);
+        this.bottomCoorY = (Window.getHeight() / 2);
+        this.topCoorY = -(Window.getHeight() / 2);
+        this.score = 0.0;
+        this.frameLeft = MAX_FRAMES;
+        this.isCoinActive = false;
         this.isRaining = false;
         this.driver = new Driver(gameProps, 0, 0);
         this.cars = new ArrayList<>();
 
+        initialiseClasses(IOUtils.readCommaSeparatedFile(OBJECT_FILE));
     }
 
-    /**
-     * Getter method of game play screen's bottom screen y-coordinate
-     * @return integer of game play screen's bottom screen y-coordinate
-     */
     public int getBottomCoorY() {
         return bottomCoorY;
     }
 
-    /**
-     * Setter method of game play screen's bottom screen y-coordinate
-     * @param bottomCoorY integer of game play screen's bottom screen y-coordinate
-     */
     public void setBottomCoorY(int bottomCoorY) {
         this.bottomCoorY = bottomCoorY;
     }
 
-    /**
-     * Getter method of game play screen's top screen y-coordinate
-     * @return integer of game play screen's top screen y-coordinate
-     */
     public int getTopCoorY() {
         return topCoorY;
     }
 
-    /**
-     * Setter method of game play screen's top screen y-coordinate
-     * @param topCoorY integer of game play screen's top screen y-coordinate
-     */
     public void setTopCoorY(int topCoorY) {
         this.topCoorY = topCoorY;
     }
 
-    /**
-     * Getter method of game play screen's score
-     * @return double of game play screen's score
-     */
     public double getScore() {
         return score;
     }
 
-    /**
-     * Setter method of game play screen's score
-     * @param score double of game play screen's score
-     */
     public void setScore(double score) {
         this.score = score;
     }
 
-    /**
-     * Getter method of game play screen's frame left
-     * @return integer  of game play screen's frame left
-     */
     public int getFrameLeft() {
         return frameLeft;
     }
 
-    /**
-     * Setter method of game play screen's frame left
-     * @param frameLeft integer of game play screen's frame left
-     */
     public void setFrameLeft(int frameLeft) {
         this.frameLeft = frameLeft;
     }
 
-    /**
-     * Getter method of game play screen's name
-     * @return String of game play screen's name
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * Setter method of game play screen's name
-     * @param name String of game play screen's name
-     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * Getter method of whether any coin is active
-     * @return true if there is a coin active, false otherwise
-     */
     public boolean getIsCoinActive() {
         return isCoinActive;
     }
 
-
-    /**
-     * Setter method of whether any coin is active
-     * @param coinActive true if there is a coin active, false otherwise
-     */
     public void setIsCoinActive(boolean coinActive) {
         isCoinActive = coinActive;
     }
@@ -265,37 +204,39 @@ public class GamePlayScreen extends Screen{
     public void loadScreen(Input input){
 
         setName(name);
-        loadWeather();
 
+        loadWeather();
         loadTaxis();
         loadTopLeft();
         loadTopRight();
         loadPassengers(passengers);
         loadTripEndFlag(passengers);
+        loadCoins(coins);
+        loadInvinciblePowers(invinciblePowers);
+        loadDriver();
+        loadCars(cars);
+        loadBottomLeft();
+        loadFireballs(cars);
+
         pickUpPassenger(input, passengers);
         updatePassengerWithTaxi();
         dropOff(input);
-        loadBottomLeft();
 
-        loadCoins(coins);
         collideCoins(coins);
+        collideInvinciblePowers(invinciblePowers);
         handleCoinFrames();
 
-        //
-        loadInvinciblePowers(invinciblePowers);
-        loadDriver();
         createCars();
+        createFireballs(cars);
+
         moveCars(cars, input);
-        loadCars(cars);
+        moveFireballs(cars, input);
 
         checkCollisions();
         decrementCollisionTimeout();
-
-        handleAllMomentum();
-        collideInvinciblePowers(invinciblePowers);
         decrementInvincibility();
 
-
+        handleAllMomentum();
         handleDriverPassengerMovement(input);
         handleInput(input);
     }
@@ -340,6 +281,7 @@ public class GamePlayScreen extends Screen{
                     } else {
                         tempBool = false;
                     }
+
                     Passenger newPassenger = new Passenger(GAME_PROPS, Integer.parseInt(allGameEntities[i][1]),
                             Integer.parseInt(allGameEntities[i][2]), Integer.parseInt(allGameEntities[i][3]),
                             Integer.parseInt(allGameEntities[i][4]), Integer.parseInt(allGameEntities[i][5]), tempBool);
@@ -631,7 +573,7 @@ public class GamePlayScreen extends Screen{
 
         String passengerHealth;
         if (currentTrip == null){
-            passengerHealth = String.format("%.1f", findPassengerMinHealth(passengers));
+            passengerHealth = String.format("%.1f", findPassengerMinHealth());
 
         } else {
             passengerHealth = String.format("%.1f", currentTrip.PASSENGER.getHealth());
@@ -819,6 +761,10 @@ public class GamePlayScreen extends Screen{
 
     }
 
+    /**
+     * Generates a random x-coordinate of given lane values
+     * @return integer of random x-coordinate of lane value
+     */
     public int randomLaneNumber(){
         int sentinelLane = MiscUtils.getRandomInt(1, NUM_LANES + 1);
         int randNumLane;
@@ -842,6 +788,10 @@ public class GamePlayScreen extends Screen{
 
     }
 
+    /**
+     * Generates a random y-coordinate between given specific values for Car
+     * @return integer of y-coordinate
+     */
     public int randomYCoor(){
         int sentinelYCoor = MiscUtils.getRandomInt(1, NUM_RANDOM_Y_COOR + 1);
         int randYCoor;
@@ -867,15 +817,27 @@ public class GamePlayScreen extends Screen{
      */
     public void checkCollisions(){
 
-        // checks collision between car and taxi, car and driver
+        // checks collision between Car and Taxi, Car and Driver
         for (Car c: cars){
             checkCollision(taxi, c);
             checkCollision(c, driver);
 
-            // checks collision between each car and every other passenger
+            // checks collision between EnemyCar's fireballs with Taxi and Driver
+            if (c instanceof EnemyCar){
+                EnemyCar enemyCar = (EnemyCar) c;
+                checkCollision(enemyCar, driver);
+                checkCollision(enemyCar, taxi);
+            }
+
+            // checks collision between Car and every other Passenger
             for (Passenger p: passengers){
                 checkCollision(c, p);
 
+                // checks collision between EnemyCar's fireballs and everyPassenger
+                if (c instanceof EnemyCar){
+                    EnemyCar enemyCar = (EnemyCar) c;
+                    checkCollision(enemyCar, p);
+                }
             }
         }
 
@@ -885,20 +847,27 @@ public class GamePlayScreen extends Screen{
                 if (i != j){
                     checkCollision(cars.get(i), cars.get(j));
 
+                    // checks collision between EnemyCar's fireballs and all other Car
+                    if (cars.get(i) instanceof EnemyCar){
+                        EnemyCar enemyCar = (EnemyCar) cars.get(i);
+                        checkCollision(enemyCar, cars.get(j));
+                    }
                 }
             }
         }
-
-
-
     }
 
-
+    /**
+     * Checks collision between Taxi and Car
+     * @param taxi Taxi object
+     * @param car Car object
+     */
     public void checkCollision(Taxi taxi, Car car){
         double sumOfRadius = taxi.RADIUS + car.RADIUS;
 
         if (taxi.calcDist(car.getCoorX(), car.getCoorY()) < sumOfRadius && car.getIsActive()) {
 
+            // taxi can only take damage if it's not in collision timeout and not invincible
             if (taxi.getCollisionTimeoutLeft() == 0 && taxi.getInvinciblePower().getFrameLeft() == 0) {
                 taxi.takeDamage(car);
             }
@@ -919,8 +888,14 @@ public class GamePlayScreen extends Screen{
         }
     }
 
+    /**
+     * Checks collision between a Car and another Car
+     * @param car1 Car object
+     * @param car2 Car object
+     */
     public void checkCollision(Car car1, Car car2) {
         double sumOfRadius = car1.RADIUS + car2.RADIUS;
+
         if (calcDist(car1, car2) < sumOfRadius && car1.getIsActive() && car2.getIsActive()) {
 
             if (car1.getCollisionTimeoutLeft() == 0) {
@@ -943,19 +918,22 @@ public class GamePlayScreen extends Screen{
         }
     }
 
+    /**
+     * Checks collision between Car and Driver
+     * @param car Car object
+     * @param driver Driver object
+     */
     public void checkCollision(Car car, Driver driver) {
         double sumOfRadius = car.RADIUS + driver.RADIUS;
+        // collision can only occur if driver is ejected from car
         if (calcDist(car, driver) < sumOfRadius && car.getIsActive() && driver.getIsEjected()) {
 
             if (driver.getCollisionTimeoutLeft() == 0){
                 driver.takeDamage(car);
             }
 
-            // car is above driver
-            if (car.getCoorY() < driver.getCoorY()) {
-                car.setMomentumCurrentFrame(-Car.MOMENTUM);
-                driver.setMomentumCurrentFrame(Driver.MOMENTUM);
-            } else {
+            // car is below driver
+            if (car.getCoorY() > driver.getCoorY()) {
                 car.setMomentumCurrentFrame(Car.MOMENTUM);
                 driver.setMomentumCurrentFrame(-Driver.MOMENTUM);
             }
@@ -963,6 +941,11 @@ public class GamePlayScreen extends Screen{
         }
     }
 
+    /**
+     * Checks collision between Car and Passenger
+     * @param car Car object
+     * @param passenger Passenger object
+     */
     public void checkCollision(Car car, Passenger passenger) {
 
         double sumOfRadius = car.RADIUS + passenger.RADIUS;
@@ -972,24 +955,124 @@ public class GamePlayScreen extends Screen{
                 passenger.takeDamage(car);
             }
 
-            // car is above ejected passenger
-            if (car.getCoorY() < passenger.getCoorY()) {
-                car.setMomentumCurrentFrame(-Car.MOMENTUM);
-                passenger.setMomentumCurrentFrame(Passenger.MOMENTUM);
-            } else {
+            // car is below passenger
+            if (car.getCoorY() > passenger.getCoorY()) {
                 car.setMomentumCurrentFrame(Car.MOMENTUM);
                 passenger.setMomentumCurrentFrame(-Passenger.MOMENTUM);
             }
-
         }
     }
 
+    /**
+     * Checks collision of EnemyCar's fireballs with Passenger
+     * @param enemyCar EnemyCar object
+     * @param passenger Passenger object
+     */
+    public void checkCollision(EnemyCar enemyCar, Passenger passenger){
+        double sumOfRadius = enemyCar.RADIUS + passenger.RADIUS;
 
+        for (Fireball f: enemyCar.getFireballs()){
+            if (calcDist(f, passenger) < sumOfRadius && f.getIsActive()) {
 
-    public static double calcDist(GameEntity gameEntity1, GameEntity gameEntity2) {
-        return Math.sqrt(Math.pow(gameEntity1.getCoorX() - gameEntity2.getCoorX(), 2) + Math.pow(gameEntity1.getCoorY() - gameEntity2.getCoorY(), 2));
+                if (passenger.getCollisionTimeoutLeft() == 0){
+                    passenger.takeDamage(f);
+                }
+
+                // fireball is below passenger
+                if (f.getCoorY() > passenger.getCoorY()) {
+                    f.setIsActive(false);
+                    passenger.setMomentumCurrentFrame(-Passenger.MOMENTUM);
+                }
+            }
+        }
     }
 
+    /**
+     * Checks collision between EnemyCar's fireballs and Driver
+     * @param enemyCar EnemyCar object
+     * @param driver Driver object
+     */
+    public void checkCollision(EnemyCar enemyCar, Driver driver){
+        double sumOfRadius = enemyCar.RADIUS + driver.RADIUS;
+
+        for (Fireball f: enemyCar.getFireballs()){
+            if (calcDist(f, driver) < sumOfRadius && f.getIsActive() && driver.getIsEjected()) {
+
+                if (driver.getCollisionTimeoutLeft() == 0){
+                    driver.takeDamage(f);
+                }
+
+                // fireball is below taxi
+                if (f.getCoorY() > driver.getCoorY()) {
+                    f.setIsActive(false);
+                    driver.setMomentumCurrentFrame(-Passenger.MOMENTUM);
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks collision between EnemyCar's fireballs and Taxi
+     * @param enemyCar EnemyCar object
+     * @param taxi Taxi object
+     */
+    public void checkCollision(EnemyCar enemyCar, Taxi taxi){
+        double sumOfRadius = enemyCar.RADIUS + taxi.RADIUS;
+
+        for (Fireball f: enemyCar.getFireballs()){
+            if (calcDist(f, taxi) < sumOfRadius && f.getIsActive()) {
+
+                if (taxi.getCollisionTimeoutLeft() == 0){
+                    taxi.takeDamage(f);
+                }
+
+                // fireball is below taxi
+                if (f.getCoorY() > taxi.getCoorY()) {
+                    f.setIsActive(false);
+                    taxi.setMomentumCurrentFrame(-Passenger.MOMENTUM);
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks collision between EnemyCar's fireballs and Car
+     * @param enemyCar EnemyCar object
+     * @param car Car object
+     */
+    public void checkCollision(EnemyCar enemyCar, Car car){
+        double sumOfRadius = enemyCar.RADIUS + taxi.RADIUS;
+
+        for (Fireball f: enemyCar.getFireballs()){
+            if (calcDist(f, car) < sumOfRadius && f.getIsActive() && car.getIsActive()) {
+
+                if (car.getCollisionTimeoutLeft() == 0){
+                    car.takeDamage(f);
+                }
+
+                // fireball is above taxi
+                if (f.getCoorY() < car.getCoorY()) {
+                    f.setIsActive(false);
+                    car.setMomentumCurrentFrame(-Passenger.MOMENTUM);
+                }
+            }
+        }
+    }
+
+    /**
+     * Calculates distance between two GameEntities
+     * @param gameEntity1 GameEntity object
+     * @param gameEntity2 GameEntity object
+     * @return double of distance between both GameEntity objects
+     */
+    public static double calcDist(GameEntity gameEntity1, GameEntity gameEntity2) {
+        return Math.sqrt(Math.pow(gameEntity1.getCoorX() - gameEntity2.getCoorX(), 2) +
+                Math.pow(gameEntity1.getCoorY() - gameEntity2.getCoorY(), 2));
+    }
+
+    /**
+     * Handles momentum of all GameEntity
+     */
     public void handleAllMomentum(){
         taxi.handleMomentum();
         for (Car c: cars){
@@ -1003,6 +1086,9 @@ public class GamePlayScreen extends Screen{
         }
     }
 
+    /**
+     * Decrements collision timeout of all GameEntity
+     */
     public void decrementCollisionTimeout(){
         taxi.decrementCollisionTimeoutLeft();
         for (Car c: cars){
@@ -1014,19 +1100,15 @@ public class GamePlayScreen extends Screen{
         }
     }
 
-
     /**
      * Loads Invincible Powers to GamePlayScreen
      * @param invinciblePowers array of Invincible Power
      */
     public void loadInvinciblePowers(InvinciblePower[] invinciblePowers){
         for (InvinciblePower i: invinciblePowers){
-
             if(!i.getIsCollided()){
                 i.IMAGE.draw(i.getCoorX(), i.getCoorY());
-
             }
-
         }
     }
 
@@ -1059,7 +1141,8 @@ public class GamePlayScreen extends Screen{
      * Assigns a new taxi if current taxi is permanently damaged
      */
     public void assignNewTaxi(){
-        if (taxi.getIsDamaged()){
+        if (taxi.getIsDamaged() && !taxi.FIRE.getIsActive()){
+
 
             damagedTaxi = new Taxi(GAME_PROPS, taxi.getCoorX(), taxi.getCoorY(), true);
 
@@ -1071,7 +1154,6 @@ public class GamePlayScreen extends Screen{
                 taxi.getCurrentPassenger().eject(taxi.getCoorX() - Passenger.EJECTION_COOR_X_MINUS,
                         taxi.getCoorY());
                 ejectedPassenger = taxi.getCurrentPassenger();
-
             }
 
             int newSpawnCoorY = MiscUtils.getRandomInt(TAXI_MAX_SPAWN_MIN_Y, TAXI_MAX_SPAWN_MAX_Y + 1);
@@ -1080,14 +1162,18 @@ public class GamePlayScreen extends Screen{
         }
     }
 
+    /**
+     * Loads both damaged and undamaged taxis, along with their Effects (if any)
+     */
     public void loadTaxis(){
         if (taxi != null){
             taxi.IMAGE.draw(taxi.getCoorX(), taxi.getCoorY());
             if (taxi.FIRE.getIsActive()){
+                System.out.println(taxi.FIRE);
                 taxi.FIRE.IMAGE.draw(taxi.FIRE.getCoorX(), taxi.FIRE.getCoorY());
                 taxi.FIRE.incrementCurrentFrame();
-
             }
+
             if (taxi.SMOKE.getIsActive()){
                 taxi.SMOKE.IMAGE.draw(taxi.SMOKE.getCoorX(), taxi.SMOKE.getCoorY());
                 taxi.SMOKE.incrementCurrentFrame();
@@ -1101,7 +1187,11 @@ public class GamePlayScreen extends Screen{
         assignNewTaxi();
     }
 
-    public double findPassengerMinHealth(Passenger[] passengers){
+    /**
+     * Finds the minimum health among all Passengers
+     * @return double of minimum health of all Passengers
+     */
+    public double findPassengerMinHealth(){
         double minHealth = Double.MAX_VALUE;
         for (Passenger p: passengers){
             if (p.getHealth() < minHealth){
@@ -1111,6 +1201,9 @@ public class GamePlayScreen extends Screen{
         return minHealth;
     }
 
+    /**
+     * Loads driver along with their Effects (if any)
+     */
     public void loadDriver(){
         if (driver.getIsEjected()){
             driver.IMAGE.draw(driver.getCoorX(), driver.getCoorY());
@@ -1122,6 +1215,10 @@ public class GamePlayScreen extends Screen{
         }
     }
 
+    /**
+     * Loads cars along with their effects (if any)
+     * @param cars ArrayList of Car
+     */
     public void loadCars(ArrayList<Car> cars){
         for (Car c: cars){
             if (c.getIsActive()) {
@@ -1140,31 +1237,37 @@ public class GamePlayScreen extends Screen{
     }
 
 
+    /**
+     * Moves car based on whether "UP" button was pressed
+     * @param cars ArrayList of Car
+     * @param input keyboard input
+     */
     public void moveCars(ArrayList<Car> cars, Input input){
-
-        if (input.isDown(Keys.UP) && !driver.getIsEjected()){
-            for (Car c: cars){
+        for (Car c: cars){
+            if (input.isDown(Keys.UP) && !driver.getIsEjected()){
                 c.moveRelativeToTaxi();
-            }
-        } else {
-            for (Car c: cars) {
+            } else {
                 c.move();
             }
         }
-
     }
 
-
+    /**
+     * Moves both damaged and undamaged Taxi down
+     */
     public void moveTaxiDown(){
         if (damagedTaxi != null){
             damagedTaxi.moveDown();
-
         }
         if (!taxi.getHasDriver()) {
             taxi.moveDown();
         }
     }
 
+    /**
+     * Handles movement of driver and passenger when they are ejected
+     * @param input keyboard input
+     */
     public void handleDriverPassengerMovement(Input input){
         if (!driver.getIsEjected()) {
             return;
@@ -1177,13 +1280,11 @@ public class GamePlayScreen extends Screen{
             moveInvinciblePowersDown(invinciblePowers);
             moveTaxiDown();
             driver.moveUp();
-
         }
 
         if (input.isDown(Keys.DOWN)){
             driver.moveDown();
             driver.BLOOD.moveDown();
-
         }
 
         if (input.isDown(Keys.LEFT)) {
@@ -1199,13 +1300,16 @@ public class GamePlayScreen extends Screen{
         checkDriverPassengerInTaxi();
     }
 
+    /**
+     * Handles input when both driver and passenger are in the taxi
+     * @param input keyboard input
+     */
     public void handleInput(Input input) {
         if (driver.getIsEjected()){
             return;
         }
 
         if (input.isDown(Keys.UP)) {
-
             moveScreenDown();
             movePassengersDown(passengers);
             moveCoinsDown(coins);
@@ -1213,7 +1317,6 @@ public class GamePlayScreen extends Screen{
             moveInvinciblePowersDown(invinciblePowers);
             moveTaxiDown();
             driver.moveWithTaxi();
-
         }
 
         if (input.isDown(Keys.LEFT)) {
@@ -1225,6 +1328,9 @@ public class GamePlayScreen extends Screen{
         }
     }
 
+    /**
+     * Checks if driver and passenger are in the taxi
+     */
     public void checkDriverPassengerInTaxi() {
         if (calcDist(driver, taxi) <= driver.TAXI_GET_IN_RADIUS){
             driver.setIsEjected(false);
@@ -1239,6 +1345,9 @@ public class GamePlayScreen extends Screen{
         }
     }
 
+    /**
+     * Decrements invincibility of taxi and driver if they have previously collected an InvinciblePower
+     */
     public void decrementInvincibility(){
         taxi.getInvinciblePower().decrementFrameLeft();
 
@@ -1248,12 +1357,54 @@ public class GamePlayScreen extends Screen{
         }
     }
 
-    // passenger, umbrella, fireball
+    /**
+     * Creates fireball for each EnemyCar
+     * @param cars ArrayList of Car
+     */
+    public void createFireballs(ArrayList<Car> cars){
+        if (MiscUtils.canSpawn(Fireball.DIVISIBILITY)){
+            for (Car c: cars){
+                if (c instanceof EnemyCar && c.getIsActive()){
+                    EnemyCar enemyCar = (EnemyCar) c;
+                    enemyCar.addFireball();
+                }
+            }
+        }
+    }
 
+    /**
+     * Moves fireballs based on whether "UP" button was pressed
+     * @param cars ArrayList of Car
+     * @param input keyboard input
+     */
+    public void moveFireballs(ArrayList<Car> cars, Input input){
+        for (Car c: cars){
+            if (c instanceof EnemyCar){
+                EnemyCar enemyCar = (EnemyCar) c;
+                if (input.isDown(Keys.UP) && !driver.getIsEjected()){
+                    enemyCar.moveFireballsRelativeToTaxi();
+                } else {
+                    enemyCar.moveFireballs();
+                }
+            }
+        }
+    }
 
-
-
-
-
+    /**
+     * Loads fireballs of EnemyCar
+     * @param cars ArrayList of Car
+     */
+    public void loadFireballs(ArrayList<Car> cars){
+        for (Car c: cars){
+            if (c instanceof EnemyCar){
+                EnemyCar enemyCar = (EnemyCar) c;
+                for (Fireball f: enemyCar.getFireballs()){
+                    if (f.getIsActive()){
+                        f.IMAGE.draw(f.getCoorX(), f.getCoorY());
+                    }
+                }
+            }
+        }
+    }
 
 }

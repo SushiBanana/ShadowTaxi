@@ -4,13 +4,15 @@ import java.util.Properties;
 
 public abstract class Effect extends GameEntity{
 
-    public final static int MOVE_FRAME = 5;
+    public final int TAXI_MOVE_FRAME_Y;
 
     private int currentFrame;
     private boolean isActive;
 
     public Effect(Properties gameProps, int coorX, int coorY){
         super(gameProps, coorX, coorY);
+        this.TAXI_MOVE_FRAME_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.speedY"));
+
 
         this.currentFrame = 0;
         this.isActive = false;
@@ -34,13 +36,13 @@ public abstract class Effect extends GameEntity{
     }
 
     public void moveDown(){
-        setCoorY(getCoorY() - MOVE_FRAME);
+        setCoorY(getCoorY() - TAXI_MOVE_FRAME_Y);
     }
 
     public void activate(int coorX, int coorY){
+        currentFrame = 0;
         isActive = true;
         setCoorX(coorX);
         setCoorY(coorY);
-
     }
 }

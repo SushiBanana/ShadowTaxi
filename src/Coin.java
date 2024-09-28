@@ -7,7 +7,7 @@ import java.util.Properties;
  */
 public class Coin extends GameEntity{
 
-    public final static int MOVE_FRAME = 5;
+    public final int TAXI_MOVE_FRAME_Y;
 
     public final int DISPLAY_FRAME_COOR_X;
     public final int DISPLAY_FRAME_COOR_Y;
@@ -28,6 +28,8 @@ public class Coin extends GameEntity{
         super(gameProps, coorX, coorY);
 
         this.IMAGE = new Image(gameProps.getProperty("gameObjects.coin.image"));
+        this.TAXI_MOVE_FRAME_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.speedY"));
+
         this.DISPLAY_FRAME_COOR_X = Integer.parseInt(gameProps.getProperty("gameplay.coin.x"));
         this.DISPLAY_FRAME_COOR_Y = Integer.parseInt(gameProps.getProperty("gameplay.coin.y"));
         this.RADIUS = Double.parseDouble(gameProps.getProperty("gameObjects.coin.radius"));
@@ -74,7 +76,7 @@ public class Coin extends GameEntity{
      * Moves coin down by incrementing its y-coordinates based on MOVE_FRAME
      */
     public void moveDown(){
-        setCoorY(getCoorY() + MOVE_FRAME);
+        setCoorY(getCoorY() + TAXI_MOVE_FRAME_Y);
     }
 
     /**

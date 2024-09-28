@@ -208,37 +208,15 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
 
     /**
      * Checks if taxi is permanently damaged
-     * @return true if yes, false otherwise
      */
-    public boolean checkIfPermanentlyDamaged(){
+    public void checkIfPermanentlyDamaged(){
         if (health <= 0){
             isDamaged = true;
             SMOKE.setIsActive(false);
-            activateFire();
+            FIRE.activate(getCoorX(), getCoorY());
+            System.out.println("here");
             hasDriver = false;
-            return true;
         }
-        return false;
-    }
-
-    public void momentumForward(){
-        return;
-    }
-
-    public void momentumBackward(){
-        return;
-    }
-
-    public void activateSmoke(){
-        SMOKE.setIsActive(true);
-        SMOKE.setCoorX(getCoorX());
-        SMOKE.setCoorY(getCoorY());
-    }
-
-    public void activateFire(){
-        SMOKE.setIsActive(true);
-        FIRE.setCoorX(getCoorX());
-        FIRE.setCoorY(getCoorY());
     }
 
     /**
@@ -248,7 +226,7 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
     @Override
     public void takeDamage(DamageDealer damageDealer) {
         if (health > 0 && collisionTimeoutLeft == 0){
-            activateSmoke();
+            SMOKE.activate(getCoorX(), getCoorY());
             health = health - damageDealer.getDamagePoints();
             collisionTimeoutLeft = COLLISION_TIMEOUT;
             checkIfPermanentlyDamaged();
