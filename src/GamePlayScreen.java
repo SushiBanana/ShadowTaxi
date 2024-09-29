@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 /**
- * This Java class contains attributes and methods related to Game Play Screen
+ * This Java class contains attributes and methods related to GamePlayScreen
  * @author Alysha Thean Student ID: 1495768
  */
 public class GamePlayScreen extends Screen{
@@ -22,10 +22,8 @@ public class GamePlayScreen extends Screen{
     public final String WEATHER_FILE; // new
     public final double TARGET_SCORE;
     public final int MAX_FRAMES;
-
     public final int INFO_FONT_SIZE;
     public final int PASSENGER_FONT_SIZE;
-
     public final int EARNINGS_COOR_X;
     public final int EARNINGS_COOR_Y;
     public final int TARGET_COOR_X;
@@ -38,16 +36,12 @@ public class GamePlayScreen extends Screen{
     public final int DRIVER_HEALTH_COOR_Y;
     public final int TAXI_HEALTH_COOR_X;
     public final int TAXI_HEALTH_COOR_Y;
-
     public final int LANE_CENTRE_1;
     public final int LANE_CENTRE_2;
     public final int LANE_CENTRE_3;
-
     public final String[][] GAME_WEATHER;
-
     public final int TAXI_MAX_SPAWN_MAX_Y;
     public final int TAXI_MAX_SPAWN_MIN_Y;
-
     public final String PAY_WORD;
     public final String TARGET_WORD;
     public final String FRAMES_REM_WORD;
@@ -60,7 +54,6 @@ public class GamePlayScreen extends Screen{
     private double score;
     private int frameLeft;
     private String name;
-
     private Taxi taxi;
     private Taxi damagedTaxi;
     private Passenger[] passengers;
@@ -69,13 +62,10 @@ public class GamePlayScreen extends Screen{
     private Driver driver;
     private Coin[] coins;
     private InvinciblePower[] invinciblePowers;
-
     private Coin collidedCoin;
     private boolean isCoinActive;
-
     private Trip currentTrip;
     private Trip lastTrip;
-
     private boolean isRaining;
 
     /**
@@ -89,7 +79,6 @@ public class GamePlayScreen extends Screen{
         this.BACKGROUND_RAIN = new Image (gameProps.getProperty("backgroundImage.raining"));
         this.OBJECT_FILE = gameProps.getProperty("gamePlay.objectsFile");
         this.WEATHER_FILE = gameProps.getProperty("gamePlay.weatherFile");
-
         this.TARGET_SCORE = Double.parseDouble(gameProps.getProperty("gamePlay.target"));
         this.MAX_FRAMES = Integer.parseInt(gameProps.getProperty("gamePlay.maxFrames"));
         this.INFO_FONT_SIZE = Integer.parseInt(gameProps.getProperty("gamePlay.info.fontSize"));
@@ -110,14 +99,12 @@ public class GamePlayScreen extends Screen{
         this.TAXI_HEALTH_COOR_X = Integer.parseInt(gameProps.getProperty("gamePlay.taxiHealth.x"));
         this.TAXI_HEALTH_COOR_Y = Integer.parseInt(gameProps.getProperty("gamePlay.taxiHealth.y"));
         this.GAME_WEATHER = IOUtils.readCommaSeparatedFile(WEATHER_FILE);
-
         this.TAXI_HEALTH_WORD = messageProps.getProperty("gamePlay.taxiHealth");
         this.DRIVER_HEALTH_WORD = messageProps.getProperty("gamePlay.driverHealth");
         this.PASSENGER_HEALTH_WORD = messageProps.getProperty("gamePlay.passengerHealth");
         this.PAY_WORD = messageProps.getProperty("gamePlay.earnings");
         this.TARGET_WORD = messageProps.getProperty("gamePlay.target");
         this.FRAMES_REM_WORD = messageProps.getProperty("gamePlay.remFrames");
-
         this.TAXI_MAX_SPAWN_MAX_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.nextSpawnMaxY"));
         this.TAXI_MAX_SPAWN_MIN_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.nextSpawnMinY"));
 
@@ -819,24 +806,24 @@ public class GamePlayScreen extends Screen{
 
         // checks collision between Car and Taxi, Car and Driver
         for (Car c: cars){
-            checkCollision(taxi, c);
-            checkCollision(c, driver);
+            CollisionHandler.checkCollision(taxi, c);
+            CollisionHandler.checkCollision(c, driver);
 
             // checks collision between EnemyCar's fireballs with Taxi and Driver
             if (c instanceof EnemyCar){
                 EnemyCar enemyCar = (EnemyCar) c;
-                checkCollision(enemyCar, driver);
-                checkCollision(enemyCar, taxi);
+                CollisionHandler.checkCollision(enemyCar, driver);
+                CollisionHandler.checkCollision(enemyCar, taxi);
             }
 
             // checks collision between Car and every other Passenger
             for (Passenger p: passengers){
-                checkCollision(c, p);
+                CollisionHandler.checkCollision(c, p);
 
                 // checks collision between EnemyCar's fireballs and everyPassenger
                 if (c instanceof EnemyCar){
                     EnemyCar enemyCar = (EnemyCar) c;
-                    checkCollision(enemyCar, p);
+                    CollisionHandler.checkCollision(enemyCar, p);
                 }
             }
         }
@@ -845,215 +832,13 @@ public class GamePlayScreen extends Screen{
         for (int i = 0; i < cars.size(); i++){
             for (int j = 0; j < cars.size(); j++) {
                 if (i != j){
-                    checkCollision(cars.get(i), cars.get(j));
+                    CollisionHandler.checkCollision(cars.get(i), cars.get(j));
 
                     // checks collision between EnemyCar's fireballs and all other Car
                     if (cars.get(i) instanceof EnemyCar){
                         EnemyCar enemyCar = (EnemyCar) cars.get(i);
-                        checkCollision(enemyCar, cars.get(j));
+                        CollisionHandler.checkCollision(enemyCar, cars.get(j));
                     }
-                }
-            }
-        }
-    }
-
-    /**
-     * Checks collision between Taxi and Car
-     * @param taxi Taxi object
-     * @param car Car object
-     */
-    public void checkCollision(Taxi taxi, Car car){
-        double sumOfRadius = taxi.RADIUS + car.RADIUS;
-
-        if (taxi.calcDist(car.getCoorX(), car.getCoorY()) < sumOfRadius && car.getIsActive()) {
-
-            // taxi can only take damage if it's not in collision timeout and not invincible
-            if (taxi.getCollisionTimeoutLeft() == 0 && taxi.getInvinciblePower().getFrameLeft() == 0) {
-                taxi.takeDamage(car);
-            }
-
-            if (car.getCollisionTimeoutLeft() == 0){
-                car.takeDamage(taxi);
-            }
-
-            // taxi is above car
-            if (taxi.getCoorY() < car.getCoorY()) {
-                taxi.setMomentumCurrentFrame(-Taxi.MOMENTUM);
-                car.setMomentumCurrentFrame(Car.MOMENTUM);
-            } else {
-                taxi.setMomentumCurrentFrame(Taxi.MOMENTUM);
-                car.setMomentumCurrentFrame(-Car.MOMENTUM);
-            }
-
-        }
-    }
-
-    /**
-     * Checks collision between a Car and another Car
-     * @param car1 Car object
-     * @param car2 Car object
-     */
-    public void checkCollision(Car car1, Car car2) {
-        double sumOfRadius = car1.RADIUS + car2.RADIUS;
-
-        if (calcDist(car1, car2) < sumOfRadius && car1.getIsActive() && car2.getIsActive()) {
-
-            if (car1.getCollisionTimeoutLeft() == 0) {
-                car1.takeDamage(car2);
-            }
-
-            if (car2.getCollisionTimeoutLeft() == 0){
-                car2.takeDamage(car1);
-            }
-
-            // car1 is above car2
-            if (car1.getCoorY() < car2.getCoorY()) {
-                car1.setMomentumCurrentFrame(-Car.MOMENTUM);
-                car2.setMomentumCurrentFrame(Car.MOMENTUM);
-            } else {
-                car1.setMomentumCurrentFrame(Car.MOMENTUM);
-                car2.setMomentumCurrentFrame(-Car.MOMENTUM);
-            }
-
-        }
-    }
-
-    /**
-     * Checks collision between Car and Driver
-     * @param car Car object
-     * @param driver Driver object
-     */
-    public void checkCollision(Car car, Driver driver) {
-        double sumOfRadius = car.RADIUS + driver.RADIUS;
-        // collision can only occur if driver is ejected from car
-        if (calcDist(car, driver) < sumOfRadius && car.getIsActive() && driver.getIsEjected()) {
-
-            if (driver.getCollisionTimeoutLeft() == 0){
-                driver.takeDamage(car);
-            }
-
-            // car is below driver
-            if (car.getCoorY() > driver.getCoorY()) {
-                car.setMomentumCurrentFrame(Car.MOMENTUM);
-                driver.setMomentumCurrentFrame(-Driver.MOMENTUM);
-            }
-
-        }
-    }
-
-    /**
-     * Checks collision between Car and Passenger
-     * @param car Car object
-     * @param passenger Passenger object
-     */
-    public void checkCollision(Car car, Passenger passenger) {
-
-        double sumOfRadius = car.RADIUS + passenger.RADIUS;
-        if (calcDist(car, passenger) < sumOfRadius && car.getIsActive()) {
-
-            if (passenger.getCollisionTimeoutLeft() == 0){
-                passenger.takeDamage(car);
-            }
-
-            // car is below passenger
-            if (car.getCoorY() > passenger.getCoorY()) {
-                car.setMomentumCurrentFrame(Car.MOMENTUM);
-                passenger.setMomentumCurrentFrame(-Passenger.MOMENTUM);
-            }
-        }
-    }
-
-    /**
-     * Checks collision of EnemyCar's fireballs with Passenger
-     * @param enemyCar EnemyCar object
-     * @param passenger Passenger object
-     */
-    public void checkCollision(EnemyCar enemyCar, Passenger passenger){
-        double sumOfRadius = enemyCar.RADIUS + passenger.RADIUS;
-
-        for (Fireball f: enemyCar.getFireballs()){
-            if (calcDist(f, passenger) < sumOfRadius && f.getIsActive()) {
-
-                if (passenger.getCollisionTimeoutLeft() == 0){
-                    passenger.takeDamage(f);
-                }
-
-                // fireball is below passenger
-                if (f.getCoorY() > passenger.getCoorY()) {
-                    f.setIsActive(false);
-                    passenger.setMomentumCurrentFrame(-Passenger.MOMENTUM);
-                }
-            }
-        }
-    }
-
-    /**
-     * Checks collision between EnemyCar's fireballs and Driver
-     * @param enemyCar EnemyCar object
-     * @param driver Driver object
-     */
-    public void checkCollision(EnemyCar enemyCar, Driver driver){
-        double sumOfRadius = enemyCar.RADIUS + driver.RADIUS;
-
-        for (Fireball f: enemyCar.getFireballs()){
-            if (calcDist(f, driver) < sumOfRadius && f.getIsActive() && driver.getIsEjected()) {
-
-                if (driver.getCollisionTimeoutLeft() == 0){
-                    driver.takeDamage(f);
-                }
-
-                // fireball is below taxi
-                if (f.getCoorY() > driver.getCoorY()) {
-                    f.setIsActive(false);
-                    driver.setMomentumCurrentFrame(-Passenger.MOMENTUM);
-                }
-            }
-        }
-    }
-
-    /**
-     * Checks collision between EnemyCar's fireballs and Taxi
-     * @param enemyCar EnemyCar object
-     * @param taxi Taxi object
-     */
-    public void checkCollision(EnemyCar enemyCar, Taxi taxi){
-        double sumOfRadius = enemyCar.RADIUS + taxi.RADIUS;
-
-        for (Fireball f: enemyCar.getFireballs()){
-            if (calcDist(f, taxi) < sumOfRadius && f.getIsActive()) {
-
-                if (taxi.getCollisionTimeoutLeft() == 0){
-                    taxi.takeDamage(f);
-                }
-
-                // fireball is below taxi
-                if (f.getCoorY() > taxi.getCoorY()) {
-                    f.setIsActive(false);
-                    taxi.setMomentumCurrentFrame(-Passenger.MOMENTUM);
-                }
-            }
-        }
-    }
-
-    /**
-     * Checks collision between EnemyCar's fireballs and Car
-     * @param enemyCar EnemyCar object
-     * @param car Car object
-     */
-    public void checkCollision(EnemyCar enemyCar, Car car){
-        double sumOfRadius = enemyCar.RADIUS + taxi.RADIUS;
-
-        for (Fireball f: enemyCar.getFireballs()){
-            if (calcDist(f, car) < sumOfRadius && f.getIsActive() && car.getIsActive()) {
-
-                if (car.getCollisionTimeoutLeft() == 0){
-                    car.takeDamage(f);
-                }
-
-                // fireball is above taxi
-                if (f.getCoorY() < car.getCoorY()) {
-                    f.setIsActive(false);
-                    car.setMomentumCurrentFrame(-Passenger.MOMENTUM);
                 }
             }
         }
