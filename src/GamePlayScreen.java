@@ -337,8 +337,8 @@ public class GamePlayScreen extends Screen{
     }
 
     /**
-     * Loads all passengers if they are not picked up or are dropped off,it also moves passenger to trip end flag if
-     * it's visible
+     * Loads all passengers if they are not picked up or are dropped off, it also moves passenger to trip end flag if
+     * it's visible and modifies priority based on weather condition
      * @param passengers array of Passengers objects
      */
     public void loadPassengers(Passenger[] passengers){
@@ -1143,7 +1143,6 @@ public class GamePlayScreen extends Screen{
     public void assignNewTaxi(){
         if (taxi.getIsDamaged() && !taxi.FIRE.getIsActive()){
 
-
             damagedTaxi = new Taxi(GAME_PROPS, taxi.getCoorX(), taxi.getCoorY(), true);
 
             if (!driver.getIsEjected()) {
@@ -1169,7 +1168,6 @@ public class GamePlayScreen extends Screen{
         if (taxi != null){
             taxi.IMAGE.draw(taxi.getCoorX(), taxi.getCoorY());
             if (taxi.FIRE.getIsActive()){
-                System.out.println(taxi.FIRE);
                 taxi.FIRE.IMAGE.draw(taxi.FIRE.getCoorX(), taxi.FIRE.getCoorY());
                 taxi.FIRE.incrementCurrentFrame();
             }
@@ -1236,7 +1234,6 @@ public class GamePlayScreen extends Screen{
         }
     }
 
-
     /**
      * Moves car based on whether "UP" button was pressed
      * @param cars ArrayList of Car
@@ -1253,7 +1250,7 @@ public class GamePlayScreen extends Screen{
     }
 
     /**
-     * Moves both damaged and undamaged Taxi down
+     * Moves both damaged and undamaged Taxi down along with effects
      */
     public void moveTaxiDown(){
         if (damagedTaxi != null){
@@ -1261,6 +1258,8 @@ public class GamePlayScreen extends Screen{
         }
         if (!taxi.getHasDriver()) {
             taxi.moveDown();
+        } else {
+            taxi.moveEffectsDown();
         }
     }
 
@@ -1284,7 +1283,6 @@ public class GamePlayScreen extends Screen{
 
         if (input.isDown(Keys.DOWN)){
             driver.moveDown();
-            driver.BLOOD.moveDown();
         }
 
         if (input.isDown(Keys.LEFT)) {
@@ -1316,15 +1314,17 @@ public class GamePlayScreen extends Screen{
             incrementDistTravelled();
             moveInvinciblePowersDown(invinciblePowers);
             moveTaxiDown();
-            driver.moveWithTaxi();
+            driver.moveWithTaxi(taxi);
         }
 
         if (input.isDown(Keys.LEFT)) {
             taxi.moveLeft();
+            driver.moveWithTaxi(taxi);
         }
 
         if (input.isDown(Keys.RIGHT)) {
             taxi.moveRight();
+            driver.moveWithTaxi(taxi);
         }
     }
 
@@ -1353,7 +1353,6 @@ public class GamePlayScreen extends Screen{
 
         if (driver.getIsEjected()) {
             driver.getInvinciblePower().decrementFrameLeft();
-
         }
     }
 

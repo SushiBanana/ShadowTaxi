@@ -8,12 +8,10 @@ import java.util.Properties;
 public class Coin extends GameEntity{
 
     public final int TAXI_MOVE_FRAME_Y;
-
     public final int DISPLAY_FRAME_COOR_X;
     public final int DISPLAY_FRAME_COOR_Y;
     public final double RADIUS;
     public final int MAX_FRAMES;
-
 
     private boolean isCollided;
     private int currentFrame;
@@ -39,41 +37,24 @@ public class Coin extends GameEntity{
         this.currentFrame = 0;
     }
 
-
-    /**
-     * Getter method of whether coin is collided
-     * @return true if collided, false otherwise
-     */
     public boolean getIsCollided() {
         return isCollided;
     }
 
-    /**
-     * Setter method of whether coin is collided
-     * @param isCollided true if collided, false otherwise
-     */
     public void setIsCollided(boolean isCollided) {
         this.isCollided = isCollided;
     }
 
-    /**
-     * Getter method of coin's current frame
-     * @return integer of coin's current frame
-     */
     public int getCurrentFrame() {
         return currentFrame;
     }
 
-    /**
-     * Setter method of coin's current frame
-     * @param currentFrame integer of coin's new current frame
-     */
     public void setCurrentFrame(int currentFrame) {
         this.currentFrame = currentFrame;
     }
 
     /**
-     * Moves coin down by incrementing its y-coordinates based on MOVE_FRAME
+     * Moves coin down by incrementing its y-coordinates based on Taxi's speed
      */
     public void moveDown(){
         setCoorY(getCoorY() + TAXI_MOVE_FRAME_Y);
@@ -87,9 +68,9 @@ public class Coin extends GameEntity{
     }
 
     /**
-     * Checks if taxi has collided with coin
-     * @param taxi Taxi object collided with coin
-     * @return true if taxi has collided with a coin, false otherwise
+     * Checks if Taxi has collided with Coin
+     * @param taxi Taxi object collided with Coin
+     * @return true if Taxi has collided with a Coin, false otherwise
      */
     public boolean hasCollided(Taxi taxi){
         boolean flag = false;
@@ -101,6 +82,24 @@ public class Coin extends GameEntity{
             flag = true;
             setIsCollided(true);
 
+        }
+        return flag;
+    }
+
+    /**
+     * Checks if Driver has collided with Coin
+     * @param driver Driver object collided with Coin
+     * @return true if Driver has collided with a Coin, false otherwise
+     */
+    public boolean hasCollided(Driver driver){
+        boolean flag = false;
+
+        double currentDist = calcDist(driver.getCoorX(), driver.getCoorY());
+        double currentRange = calcRange(driver.RADIUS);
+
+        if (currentDist <= currentRange){
+            flag = true;
+            setIsCollided(true);
         }
         return flag;
     }
@@ -129,22 +128,11 @@ public class Coin extends GameEntity{
      * @return String of states of coin
      */
     public String toString(){
-        return "Coin\n" + "_____________\nx-coordinate: " + getCoorX() + "\ny-coordinate: " + getCoorY() + "\nis collided: " +
-                isCollided + "\ncurrent frame:" + currentFrame;
+        return "Coin" +
+                "\n_____________ "+
+                "\nx-coordinate: " + getCoorX() +
+                "\ny-coordinate: " + getCoorY() +
+                "\nis collided: " + isCollided +
+                "\ncurrent frame:" + currentFrame;
     }
-
-    public boolean hasCollided(Driver driver){
-        boolean flag = false;
-
-        double currentDist = calcDist(driver.getCoorX(), driver.getCoorY());
-        double currentRange = calcRange(driver.RADIUS);
-
-        if (currentDist <= currentRange){
-            flag = true;
-            setIsCollided(true);
-
-        }
-        return flag;
-    }
-
 }

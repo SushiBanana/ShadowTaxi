@@ -38,6 +38,14 @@ public class PlayerInfoScreen extends Screen{
 
     }
 
+    public String getName(){
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     /**
      * Renders Player Information Screen and gets input from player, while handling removal of name
      * @param input keyboard input
@@ -75,22 +83,6 @@ public class PlayerInfoScreen extends Screen{
 
         return res;
 
-    }
-
-    /**
-     * Getter method for name
-     * @return String of player's name
-     */
-    public String getName(){
-        return name;
-    }
-
-    /**
-     * Setter method for name
-     * @param name String of player's new name
-     */
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**

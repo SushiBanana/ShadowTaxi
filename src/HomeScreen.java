@@ -39,7 +39,6 @@ public class HomeScreen extends Screen {
     @Override
     public void loadScreen(Input input) {
         IMAGE.draw(Window.getWidth()/2.0, Window.getHeight()/2.0);
-
         loadFont(FONT_FILE, HOME_TITLE_WORD, HOME_TITLE_FONT_SIZE, TITLE_COOR_Y);
         loadFont(FONT_FILE, HOME_INSTRUCTION_WORD, HOME_INSTRUCTION_FONT_SIZE, INSTRUCTION_COOR_Y);
 

@@ -205,6 +205,10 @@ public class ShadowTaxi extends AbstractGame {
         }
     }
 
+    /**
+     * Checks if Taxi is out of frame
+     * @return true if taxi is no longer in frame, false otherwise
+     */
     public boolean checkTaxiOutOfFrame() {
         boolean flag;
         if (gamePlayScreen.getTaxi().isOutOfFrame() && gamePlayScreen.getDriver().getIsEjected()){
@@ -217,7 +221,10 @@ public class ShadowTaxi extends AbstractGame {
         return flag;
     }
 
-
+    /**
+     * Checks health of Driver and all Passenger
+     * @return true if either Driver or one Passenger's health is below 0, false otherwise
+     */
     public boolean checkHealth(){
         boolean flag;
         if (checkDriverHealth() || gamePlayScreen.findPassengerMinHealth() <= 0){
@@ -230,6 +237,10 @@ public class ShadowTaxi extends AbstractGame {
         return flag;
     }
 
+    /**
+     * Checks Driver's health
+     * @return true if Driver's health if its below 0, false otherwise
+     */
     public boolean checkDriverHealth() {
         return gamePlayScreen.getDriver().getIsEjected() && gamePlayScreen.getDriver().getHealth() <= 0 &&
                 !gamePlayScreen.getDriver().BLOOD.getIsActive();

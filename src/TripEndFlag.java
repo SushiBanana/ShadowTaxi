@@ -2,12 +2,12 @@ import bagel.Image;
 import java.util.Properties;
 
 /**
- * This Java class contains attributes and methods related to Trip End Flag
+ * This Java class contains attributes and methods related to TripEndFlag
  * @author Alysha Thean Student ID: 1495768
  */
 public class TripEndFlag extends GameEntity{
-    public final int TAXI_MOVE_FRAME_Y = 5;
 
+    public final int TAXI_MOVE_FRAME_Y;
     public final int RADIUS;
 
     private boolean isVisible;
@@ -21,24 +21,16 @@ public class TripEndFlag extends GameEntity{
     public TripEndFlag(Properties gameProps,int coorX, int coorY){
         super(gameProps, coorX, coorY);
         this.IMAGE = new Image(gameProps.getProperty("gameObjects.tripEndFlag.image"));
+        this.TAXI_MOVE_FRAME_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.speedY"));
         this.RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.tripEndFlag.radius"));
 
         this.isVisible = false;
     }
 
-
-    /**
-     * Getter method for whether trip end flag is visible
-     * @return true if visible, false otherwise
-     */
     public boolean getIsVisible() {
         return isVisible;
     }
 
-    /**
-     * Setter method for whether trip end flag is visible
-     * @param isVisible true if visible, false otherwise
-     */
     public void setIsVisible(boolean isVisible) {
         this.isVisible = isVisible;
     }
@@ -51,12 +43,15 @@ public class TripEndFlag extends GameEntity{
     }
 
     /**
-     * Returns the state of trip end flag
-     * @return String of states in trip end flag
+     * Returns the state of TripEndFlag object
+     * @return String of states in TripEndFlag
      */
     public String toString() {
-        return "Trip End Flag \n ___________\n" + "IMAGE: " + IMAGE + "\nRADIUS: " + RADIUS + "\nx-coordinate: " +
-                getCoorX() + "\ny-coordinate: " + getCoorY() + "\nisVisible: " + isVisible + "\n";
+        return "Trip End Flag \n ___________" +
+                "\nIMAGE: " + IMAGE +
+                "\nRADIUS: " + RADIUS +
+                "\nx-coordinate: " + getCoorX() +
+                "\ny-coordinate: " + getCoorY() +
+                "\nisVisible: " + isVisible;
     }
-
 }

@@ -5,7 +5,7 @@ import bagel.Window;
 import java.util.Properties;
 
 /**
- * This Java class contains attributes and methods related to abstract class Screen
+ * This Java abstract class contains attributes and methods related to abstract class Screen
  * @author Alysha Thean Student ID: 1495768
  */
 public abstract class Screen {
@@ -32,18 +32,10 @@ public abstract class Screen {
         this.isActive = false;
     }
 
-    /**
-     * Setter method for is screen active
-     * @param flag boolean of whether screen is active
-     */
     public void setIsActive(boolean flag){
         this.isActive = flag;
     }
 
-    /**
-     * Getter method for is screen active
-     * @return boolean of whether screen is active
-     */
     public boolean getIsActive(){
         return isActive;
     }

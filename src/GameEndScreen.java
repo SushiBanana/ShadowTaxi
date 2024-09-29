@@ -61,7 +61,6 @@ public class GameEndScreen extends Screen{
             double displayNameCoorY = TOP_5_SCORES_COOR_Y + GAME_END_INCREMENT_COOR * (i + 1);
             loadFont(FONT_FILE, displayNameScore, SCORES_FONT_SIZE, displayNameCoorY);
         }
-
     }
 
     /**

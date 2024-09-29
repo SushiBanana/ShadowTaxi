@@ -1,5 +1,9 @@
 import java.util.Properties;
 
+/**
+ * This Java abstract class contains attributes and methods related to Car
+ * @author Alysha Thean Student ID: 1495768
+ */
 public abstract class Car extends GameEntity implements Damageable, DamageDealer{
 
     public final static int COLLISION_TIMEOUT = 200;
@@ -21,11 +25,14 @@ public abstract class Car extends GameEntity implements Damageable, DamageDealer
     private double health;
     private int momentumCurrentFrame;
     private int collisionTimeoutLeft;
-
-
     private boolean isActive;
 
-
+    /**
+     * Constructor for Car class
+     * @param gameProps properties file for values of various attributes
+     * @param coorX x-coordinate of Car
+     * @param coorY y-coordinate of Car
+     */
     public Car (Properties gameProps, int coorX, int coorY){
         super(gameProps, coorX, coorY);
         this.MIN_SPEED_Y = Integer.parseInt(gameProps.getProperty("gameObjects.otherCar.minSpeedY"));
@@ -83,6 +90,25 @@ public abstract class Car extends GameEntity implements Damageable, DamageDealer
         this.moveFrame = moveFrame;
     }
 
+    /**
+     * Returns Car's damage points
+     * @return double of Car damage points
+     */
+    @Override
+    public double getDamagePoints(){
+        return DAMAGE_POINTS;
+    }
+
+    /**
+     * Sets Car's new randomly generated move frame
+     */
+    public void setNewRandomMoveFrame(){
+        moveFrame = MiscUtils.getRandomInt(MIN_SPEED_Y, MAX_SPEED_Y + 1);
+    }
+
+    /**
+     * Moves Car based on its moving frame speed
+     */
     public void move() {
         if (momentumCurrentFrame != 0){
             return;
@@ -90,6 +116,9 @@ public abstract class Car extends GameEntity implements Damageable, DamageDealer
         setCoorY(getCoorY() - moveFrame);
     }
 
+    /**
+     * Moves Car based on its moving frame speed relative to Taxi's speed
+     */
     public void moveRelativeToTaxi(){
         if (momentumCurrentFrame != 0){
             return;
@@ -97,10 +126,9 @@ public abstract class Car extends GameEntity implements Damageable, DamageDealer
         setCoorY(getCoorY() - (moveFrame - TAXI_MOVE_FRAME_Y));
     }
 
-    public double getDamagePoints(){
-        return DAMAGE_POINTS;
-    }
-
+    /**
+     * Checks the health of Car and activates relevant Effect
+     */
     public void checkHealth() {
         if (getHealth() <= 0){
             SMOKE.setIsActive(false);
@@ -108,12 +136,18 @@ public abstract class Car extends GameEntity implements Damageable, DamageDealer
         }
     }
 
+    /**
+     * Deactivates Car after all Fire frames are done rendering
+     */
     public void deactivateAfterFire(){
         if (!FIRE.getIsActive()) {
             setIsActive(false);
         }
     }
 
+    /**
+     * Handles Car's momentum after collision and
+     */
     public void handleMomentum() {
         if (momentumCurrentFrame == 0){
             return;
@@ -127,16 +161,13 @@ public abstract class Car extends GameEntity implements Damageable, DamageDealer
         }
     }
 
-    public void setNewRandomMoveFrame(){
-        moveFrame = MiscUtils.getRandomInt(MIN_SPEED_Y, MAX_SPEED_Y + 1);
-    }
-
+    /**
+     * Decrements remaining collision timeout frames
+     */
     public void decrementCollisionTimeoutLeft(){
         if (collisionTimeoutLeft > 0){
             collisionTimeoutLeft--;
         }
     }
-
-
 
 }

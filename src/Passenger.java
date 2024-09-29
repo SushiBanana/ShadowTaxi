@@ -7,8 +7,12 @@ import java.util.Properties;
  */
 public class Passenger extends GameEntity implements Damageable{
 
+    public final static int EJECTION_COOR_X_MINUS = 100;
+    public static final int MOMENTUM = 10;
+    public final static int COOR_Y_MOVEMENT_STEP = 2;
+    public final static int COLLISION_TIMEOUT = 200;
+
     public final int TAXI_MOVE_FRAME_Y;
-    
     public final TripEndFlag TRIP_END_FLAG;
     public final int ADJACENT_DIST;
     public final int WALK_SPEED_X;
@@ -18,6 +22,8 @@ public class Passenger extends GameEntity implements Damageable{
     public final int RATE_PRIORITY_2;
     public final int RATE_PRIORITY_3;
     public final Blood BLOOD;
+    public final int RADIUS;
+    public final int TAXI_GET_IN_RADIUS;
 
     private int currentPriority;
     private int originalPriority;
@@ -26,23 +32,11 @@ public class Passenger extends GameEntity implements Damageable{
     private double earnings;
     private boolean isPickedUp;
     private boolean isDroppedOff;
-
-    //
-    public final static int EJECTION_COOR_X_MINUS = 100;
-    public static final int MOMENTUM = 10;
-    public final static int COOR_Y_MOVEMENT_STEP = 2;
-    public final static int COLLISION_TIMEOUT = 200;
-
-
-    public final int RADIUS;
-    public final int TAXI_GET_IN_RADIUS;
-
     private double health;
     private boolean hasUmbrella;
     private boolean isEjected;
     private int collisionTimeoutLeft;
     private int momentumCurrentFrame;
-    private int rainPriority;
 
     /**
      * Constructor for Passenger class
@@ -65,6 +59,11 @@ public class Passenger extends GameEntity implements Damageable{
         this.RATE_PRIORITY_1 = Integer.parseInt(gameProps.getProperty("trip.rate.priority1"));
         this.RATE_PRIORITY_2 = Integer.parseInt(gameProps.getProperty("trip.rate.priority2"));
         this.RATE_PRIORITY_3 = Integer.parseInt(gameProps.getProperty("trip.rate.priority3"));
+        this.RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.passenger.radius"));
+        this.TAXI_GET_IN_RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.passenger.taxiGetInRadius"));
+        this.health = Double.parseDouble(gameProps.getProperty("gameObjects.passenger.health")) * 100;
+        this.BLOOD = new Blood (gameProps, getCoorX(), getCoorY());
+        this.TAXI_MOVE_FRAME_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.speedY"));
 
         this.currentPriority = priority;
         this.originalPriority = priority;
@@ -73,132 +72,98 @@ public class Passenger extends GameEntity implements Damageable{
         this.earnings = calcExpEarnings(yDist);
         this.isPickedUp = false;
         this.isDroppedOff = false;
-
-        //
         this.hasUmbrella = hasUmbrella;
         this.isEjected = false;
 
-        this.RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.passenger.radius"));
-        this.TAXI_GET_IN_RADIUS = Integer.parseInt(gameProps.getProperty("gameObjects.passenger.taxiGetInRadius"));
-        this.health = Double.parseDouble(gameProps.getProperty("gameObjects.passenger.health")) * 100;
-        this.BLOOD = new Blood (gameProps, getCoorX(), getCoorY());
-        this.TAXI_MOVE_FRAME_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.speedY"));
-
-
     }
 
-    /**
-     * Getter method for passenger's priority
-     * @return integer of passenger's priority
-     */
     public int getCurrentPriority() {
         return currentPriority;
     }
 
-    /**
-     * Setter method for passenger's priority
-     * @param currentPriority integer of passenger's new priority
-     */
     public void setCurrentPriority(int currentPriority) {
         this.currentPriority = currentPriority;
     }
 
-    /**
-     * Getter method for whether passenger is picked up
-     * @return true if passenger has been picked up, false otherwise
-     */
     public boolean getIsPickedUp(){
         return isPickedUp;
     }
 
-    /**
-     * Setter method for whether passenger is picked up
-     * @param isPickedUp true if passenger has been picked up, false otherwise
-     */
     public void setIsPickedUp(boolean isPickedUp){
         this.isPickedUp = isPickedUp;
     }
 
-    /**
-     * Getter method for passenger's earnings
-     * @return double of passenger's earnings
-     */
     public double getEarnings() {
         return earnings;
     }
 
-    /**
-     * Setter method for passenger's earnings
-     * @param earnings double of passenger's new earnings
-     */
     public void setEarnings(double earnings) {
         this.earnings = earnings;
     }
 
-    /**
-     * Getter method of vertical distance passenger intends to travel
-     * @return integer of vertical distance passenger intends to travel
-     */
     public int getYDist() {
         return yDist;
     }
 
-    /**
-     * Setter method of vertical distance passenger intends to travel
-     * @param yDist integer of vertical distance passenger intends to travel
-     */
     public void setYDist(int yDist) {
         this.yDist = yDist;
     }
 
-    /**
-     * Getter method of passenger's end of trip x-coordinate
-     * @return integer of passenger's end of trip x-coordinate
-     */
     public int getEndCoorX() {
         return endCoorX;
     }
 
-    /**
-     * Setter method of passenger's end of trip x-coordinate
-     * @param endCoorX integer of passenger's end of trip x-coordinate
-     */
     public void setEndCoorX(int endCoorX) {
         this.endCoorX = endCoorX;
     }
 
-    /**
-     * Getter method of whether passenger has umbrella
-     * @return boolean of whether passenger has umbrella
-     */
     public boolean getHasUmbrella() {
         return hasUmbrella;
     }
 
-    /**
-     * Setter method of whether passenger has umbrella
-     * @param hasUmbrella boolean of whether passenger has umbrella
-     */
     public void setHasUmbrella(boolean hasUmbrella) {
         this.hasUmbrella = hasUmbrella;
     }
 
-    /**
-     * Getter method of passenger's health
-     * @return double of passenger's health
-     */
     public double getHealth() {
         return health;
     }
 
-    /**
-     * Setter method of passenger's health
-     * @param health double of passenger's health
-     */
     public void setHealth(double health) {
         this.health = health;
     }
 
+    public boolean isDroppedOff() {
+        return isDroppedOff;
+    }
+
+    public void setIsDroppedOff(boolean isDroppedOff) {
+        this.isDroppedOff = isDroppedOff;
+    }
+
+    public boolean getIsEjected() {
+        return isEjected;
+    }
+
+    public void setIsEjected(boolean isEjected) {
+        this.isEjected = isEjected;
+    }
+
+    public int getCollisionTimeoutLeft() {
+        return collisionTimeoutLeft;
+    }
+
+    public void setCollisionTimeoutLeft(int collisionTimeoutLeft) {
+        this.collisionTimeoutLeft = collisionTimeoutLeft;
+    }
+
+    public int getMomentumCurrentFrame() {
+        return momentumCurrentFrame;
+    }
+
+    public void setMomentumCurrentFrame(int momentumCurrentFrame) {
+        this.momentumCurrentFrame = momentumCurrentFrame;
+    }
 
     /**
      * Moves passenger and passenger's trip end flag by incrementing its y-coordinates based on MOVE_FRAME
@@ -248,7 +213,6 @@ public class Passenger extends GameEntity implements Damageable{
             setCoorY(getCoorY() - WALK_SPEED_Y);
 
         }
-
     }
 
     /**
@@ -266,45 +230,7 @@ public class Passenger extends GameEntity implements Damageable{
         return flag;
     }
 
-    /**
-     * Setter method for whether passenger is dropped off
-     * @return true if passenger has been dropped off, false otherwise
-     */
-    public boolean isDroppedOff() {
-        return isDroppedOff;
-    }
 
-    /**
-     * Setter method for whether passenger is dropped off
-     * @param isDroppedOff boolean of whether passenger is dropped off
-     */
-    public void setIsDroppedOff(boolean isDroppedOff) {
-        this.isDroppedOff = isDroppedOff;
-    }
-
-    public boolean getIsEjected() {
-        return isEjected;
-    }
-
-    public void setIsEjected(boolean isEjected) {
-        this.isEjected = isEjected;
-    }
-
-    public int getCollisionTimeoutLeft() {
-        return collisionTimeoutLeft;
-    }
-
-    public void setCollisionTimeoutLeft(int collisionTimeoutLeft) {
-        this.collisionTimeoutLeft = collisionTimeoutLeft;
-    }
-
-    public int getMomentumCurrentFrame() {
-        return momentumCurrentFrame;
-    }
-
-    public void setMomentumCurrentFrame(int momentumCurrentFrame) {
-        this.momentumCurrentFrame = momentumCurrentFrame;
-    }
 
     /**
      * Increments one of passenger's x or y-coordinates towards their trip end flag based on WALK_SPEED_X and
@@ -316,7 +242,6 @@ public class Passenger extends GameEntity implements Damageable{
             TRIP_END_FLAG.setIsVisible(false);
             return;
         }
-
 
         if (getCoorX() < TRIP_END_FLAG.getCoorX()){
             setCoorX(getCoorX() + WALK_SPEED_X);
@@ -335,7 +260,7 @@ public class Passenger extends GameEntity implements Damageable{
     }
 
     /**
-     * Decrements passenger's priority
+     * Decrements passenger's current and original priority
      */
     public void decrementPriority(){
         if (currentPriority < 1 || originalPriority < 1){
@@ -359,11 +284,9 @@ public class Passenger extends GameEntity implements Damageable{
                 rate = RATE_PRIORITY_1;
                 break;
 
-
             case 2:
                 rate = RATE_PRIORITY_2;
                 break;
-
 
             case 3:
                 rate = RATE_PRIORITY_3;
@@ -380,26 +303,20 @@ public class Passenger extends GameEntity implements Damageable{
     }
 
     /**
-     * Returns the state of passenger class
-     * @return String of states in passenger class
+     * Ejects Passenger
+     * @param coorX x-coordinate of Passenger
+     * @param coorY y-coodinate of Passenger
      */
-    public String toString(){
-        return "Passenger\n" + "_____________\n" + "IMAGE: " + IMAGE + "\nx-coordinate: " + getCoorX() + "\n" +"y" +
-                "-coordinate: " + getCoorY() + "\n" +
-                "current priority: " + currentPriority + "\n" + TRIP_END_FLAG +
-                "has umbrella: " + hasUmbrella +
-                "\nis ejected: " + isEjected +
-                "\nis picked up: " + isPickedUp +
-                "\nis dropped off: " + isDroppedOff+
-                "\nmomentum current frame: " + momentumCurrentFrame;
-    }
-
     public void eject(int coorX, int coorY){
         setIsEjected(true);
         setCoorX(coorX);
         setCoorY(coorY);
     }
 
+    /**
+     * Updates coordinates of Passenger with Driver by altering either x or y coordinate once
+     * @param driver Driver object
+     */
     public void followDriver(Driver driver){
         if (getCoorX() < driver.getCoorX()){
             setCoorX(getCoorX() + WALK_SPEED_X);
@@ -414,9 +331,11 @@ public class Passenger extends GameEntity implements Damageable{
             setCoorY(getCoorY() - WALK_SPEED_Y);
 
         }
-
     }
 
+    /**
+     * Handles momentum of Passenger during collision
+     */
     public void handleMomentum(){
         if (momentumCurrentFrame == 0){
             return;
@@ -430,43 +349,77 @@ public class Passenger extends GameEntity implements Damageable{
         }
     }
 
+    /**
+     * Decrements Passenger's collision timeout remaining frames
+     */
     public void decrementCollisionTimeoutLeft(){
         if (collisionTimeoutLeft > 0){
             collisionTimeoutLeft--;
         }
     }
 
+    /**
+     * Checks the health of Passenger and if below zero, activates blood
+     */
     public void checkHealth(){
         if (getHealth() <= 0){
             activateBlood();
         }
     }
 
-
+    /**
+     * Activates blood of Passenger
+     */
     public void activateBlood(){
         BLOOD.setIsActive(true);
         BLOOD.setCoorX(getCoorX());
         BLOOD.setCoorY(getCoorY());
     }
 
+    /**
+     * Takes damage from a DamageDealer object
+     * @param damageDealer DamageDealer object
+     */
     @Override
     public void takeDamage(DamageDealer damageDealer) {
         if (getHealth() > 0 && getCollisionTimeoutLeft() == 0){
-
             setHealth(getHealth() - damageDealer.getDamagePoints());
             setCollisionTimeoutLeft(COLLISION_TIMEOUT);
             checkHealth();
-
         }
     }
 
+    /**
+     * Changes Passenger's priority when raining
+     */
     public void changePriorityWhenRaining(){
         if (!hasUmbrella){
             currentPriority = 1;
         }
     }
 
+    /**
+     * Reverts Passenger's priority to original priority when no longer raining
+     */
     public void revertPriorityWhenSunny(){
         currentPriority = originalPriority;
+    }
+
+    /**
+     * Returns the state of passenger class
+     * @return String of states in passenger class
+     */
+    public String toString(){
+        return "Passenger\n" + "_____________" +
+                "\nIMAGE: " + IMAGE +
+                "\nx-coordinate: " + getCoorX() +
+                "\ny-coordinate: " + getCoorY() +
+                "\ncurrent priority: " + currentPriority +
+                TRIP_END_FLAG +
+                "\nhas umbrella: " + hasUmbrella +
+                "\nis ejected: " + isEjected +
+                "\nis picked up: " + isPickedUp +
+                "\nis dropped off: " + isDroppedOff+
+                "\nmomentum current frame: " + momentumCurrentFrame;
     }
 }
