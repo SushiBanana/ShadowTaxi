@@ -42,13 +42,6 @@ public class Fireball extends GameEntity implements DamageDealer{
         isActive = active;
     }
 
-    public void move(){
-        if (getCoorY() <= 0){
-            setIsActive(false);
-        }
-        setCoorY(getCoorY() - SHOOT_SPEED);
-    }
-
     /**
      * Getter method for damage points because Fireball can deal damage
      * @return double of Fireball damage points
@@ -56,6 +49,16 @@ public class Fireball extends GameEntity implements DamageDealer{
     @Override
     public double getDamagePoints() {
         return DAMAGE_POINTS;
+    }
+
+    /**
+     * Moves Fireball based on SHOOT_SPEED and is considered not active after it reaches the top of the screen
+     */
+    public void move(){
+        if (getCoorY() <= 0){
+            setIsActive(false);
+        }
+        setCoorY(getCoorY() - SHOOT_SPEED);
     }
 
     /**

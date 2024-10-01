@@ -256,7 +256,6 @@ public class Passenger extends GameEntity implements Damageable{
             setCoorY(getCoorY() - WALK_SPEED_Y);
 
         }
-
     }
 
     /**
@@ -268,6 +267,14 @@ public class Passenger extends GameEntity implements Damageable{
         }
         currentPriority--;
         originalPriority--;
+        earnings = calcExpEarnings(getYDist());
+    }
+
+    /**
+     * Sets current priority to original priority
+     */
+    public void lockPriority(){
+        currentPriority = originalPriority;
     }
 
     /**
