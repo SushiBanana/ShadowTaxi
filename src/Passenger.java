@@ -420,10 +420,10 @@ public class Passenger extends GameEntity implements Damageable{
     }
 
     /**
-     * Sets current priority to original priority
+     * Sets original priority to current priority
      */
     public void lockPriority(){
-        currentPriority = originalPriority;
+        originalPriority = currentPriority;
     }
 
     /**

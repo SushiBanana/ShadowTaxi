@@ -7,7 +7,11 @@ Assumptions made
    example, if a passenger without an umbrella is picked up when it is sunny, and then it starts to rain, their 
    priority would remain unchanged because they are already in the car and have a roof over their heads (not 
    affected by rain).
-4. Cars immediately start moving after collision (unlike cars in the demo video that stop for a while before moving 
+4. During collision timeout, damageable entities like other car, enemy car and taxi, cannot take damage, however the 
+   entity causing the collision with the entity in collision timeout can take damage as long as the entity causing 
+   the collision is also not in collision timeout. For example, if an enemy car (not in collision timeout) causes a 
+   collision with an other car (in collision timeout), the other car is not damaged but the enemy car gets damaged.
+5. Cars immediately start moving after collision (unlike cars in the demo video that stop for a while before moving 
    again).
-5. Although the fireball could collide with cars after it reaches the top of the screen, the fireball is not 
+6. Although the fireball could collide with cars after it reaches the top of the screen, the fireball is not 
    rendered and is considered no longer active (according to the specification)
