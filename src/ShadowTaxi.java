@@ -9,8 +9,17 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public class ShadowTaxi extends AbstractGame {
+    /**
+     * The game properties of shadow taxi
+     */
     public final Properties GAME_PROPS;
+    /**
+     * The message properties of shadow taxi
+     */
     public final Properties MESSAGE_PROPS;
+    /**
+     * The score file of shadow taxi
+     */
     public final String SCORE_FILE;
 
     private HomeScreen homeScreen;
@@ -18,7 +27,6 @@ public class ShadowTaxi extends AbstractGame {
     private GamePlayScreen gamePlayScreen;
     private GameEndScreen gameEndScreen;
     private boolean hasWrittenToFile;
-
 
     /**
      * Constructor for ShadowTaxi
@@ -30,7 +38,6 @@ public class ShadowTaxi extends AbstractGame {
                 Integer.parseInt(gameProps.getProperty("window.height")),
                 messageProps.getProperty("home.title"));
 
-
         this.GAME_PROPS = gameProps;
         this.MESSAGE_PROPS = messageProps;
         SCORE_FILE = gameProps.getProperty("gameEnd.scoresFile");
@@ -41,7 +48,86 @@ public class ShadowTaxi extends AbstractGame {
         this.gameEndScreen = new GameEndScreen(gameProps, messageProps);
         this.hasWrittenToFile = false;
 
+    }
 
+    /**
+     * Gets the home screen of shadow taxi
+     * @return shadow taxi's home screen
+     */
+    public HomeScreen getHomeScreen() {
+        return homeScreen;
+    }
+
+    /**
+     * Sets the home screen of shadow taxi
+     * @param homeScreen shadow taxi's home screen
+     */
+    public void setHomeScreen(HomeScreen homeScreen) {
+        this.homeScreen = homeScreen;
+    }
+
+    /**
+     * Gets the game play screen of shadow taxi
+     * @return shadow taxi's game play screen
+     */
+    public GamePlayScreen getGamePlayScreen() {
+        return gamePlayScreen;
+    }
+
+    /**
+     * Sets the game play screen of shadow taxi
+     * @param gamePlayScreen shadow taxi's game play screen
+     */
+    public void setGamePlayScreen(GamePlayScreen gamePlayScreen) {
+        this.gamePlayScreen = gamePlayScreen;
+    }
+
+    /**
+     * Gets the game end screen of shadow taxi
+     * @return shadow taxi's game end screen
+     */
+    public GameEndScreen getGameEndScreen() {
+        return gameEndScreen;
+    }
+
+    /**
+     * Sets the game end screen of shadow taxi
+     * @param gameEndScreen shadow taxi's game end screen
+     */
+    public void setGameEndScreen(GameEndScreen gameEndScreen) {
+        this.gameEndScreen = gameEndScreen;
+    }
+
+    /**
+     * Gets the player information screen of shadow taxi
+     * @return shadow taxi's player information screen
+     */
+    public PlayerInfoScreen getPlayerInfoScreen() {
+        return playerInfoScreen;
+    }
+
+    /**
+     * Sets the player information screen of shadow taxi
+     * @param playerInfoScreen shadow taxi's player information screen
+     */
+    public void setPlayerInfoScreen(PlayerInfoScreen playerInfoScreen) {
+        this.playerInfoScreen = playerInfoScreen;
+    }
+
+    /**
+     * Gets whether shadow taxi has written to file
+     * @return true if shadow taxi has written to file, false otherwise
+     */
+    public boolean getHasWrittenToFile() {
+        return hasWrittenToFile;
+    }
+
+    /**
+     * Sets whether shadow taxi has written to file
+     * @param hasWrittenToFile true if shadow taxi has written to file, false otherwise
+     */
+    public void setHasWrittenToFile(boolean hasWrittenToFile) {
+        this.hasWrittenToFile = hasWrittenToFile;
     }
 
     /**
@@ -54,7 +140,6 @@ public class ShadowTaxi extends AbstractGame {
 
         gamePlayScreen.decrementFrameLeft();
 
-
         if (homeScreen.getIsActive()) {
             loadHomeScreen(input);
         }
@@ -65,7 +150,6 @@ public class ShadowTaxi extends AbstractGame {
 
         if (gamePlayScreen.getIsActive()) {
             loadGamePlayScreen(input);
-
         }
 
         if (gameEndScreen.getIsActive()) {
@@ -79,7 +163,6 @@ public class ShadowTaxi extends AbstractGame {
         if (input.wasPressed(Keys.ESCAPE)){
             Window.close();
         }
-
 
     }
 

@@ -9,10 +9,21 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public abstract class Screen {
-
+    /**
+     * The game properties of screen
+     */
     public final Properties GAME_PROPS;
+    /**
+     * The message properties of screen
+     */
     public final Properties MESSAGE_PROPS;
+    /**
+     * The image of screen
+     */
     public final Image IMAGE;
+    /**
+     * The font file of screen
+     */
     public final String FONT_FILE;
 
     private boolean isActive;
@@ -32,12 +43,20 @@ public abstract class Screen {
         this.isActive = false;
     }
 
-    public void setIsActive(boolean flag){
-        this.isActive = flag;
-    }
-
+    /**
+     * Gets whether the screen is active
+     * @return true if active, false otherwise
+     */
     public boolean getIsActive(){
         return isActive;
+    }
+
+    /**
+     * Sets whether the screen is active
+     * @param flag true if active, false otherwise
+     */
+    public void setIsActive(boolean flag){
+        this.isActive = flag;
     }
 
     /**

@@ -6,14 +6,16 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public class Smoke extends Effect {
-
+    /**
+     * The time to live of smoke
+     */
     public final int TTL;
 
     /**
      * Constructor for Smoke class
      * @param gameProps properties file for values of various attributes
-     * @param coorX x-coordinate of Smoke
-     * @param coorY y-coordinate of Smoke
+     * @param coorX x-coordinate of smoke
+     * @param coorY y-coordinate of smoke
      */
     public Smoke(Properties gameProps, int coorX, int coorY){
         super(gameProps, coorX, coorY);
@@ -22,7 +24,7 @@ public class Smoke extends Effect {
     }
 
     /**
-     * Increments current frame of Smoke
+     * Increments current frame of smoke
      */
     public void incrementCurrentFrame(){
         if (getCurrentFrame() == TTL){
@@ -34,7 +36,7 @@ public class Smoke extends Effect {
 
     /**
      * Returns the state of Smoke object
-     * @return String of states of Smoke
+     * @return String of states of smoke
      */
     public String toString(){
         return "Smoke\n____________" +

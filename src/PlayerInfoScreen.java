@@ -6,14 +6,37 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public class PlayerInfoScreen extends Screen{
+    /**
+     * The x-coordinate spacing of player information in player information screen
+     */
     public final static int PLAYER_INFO_SPACING = 30;
+    /**
+     * The code value of colour black
+     */
     public final static double BLACK_CODE = 0.0;
-
+    /**
+     * The enter name word of player information screen
+     */
     public final String ENTER_NAME_WORD;
+    /**
+     * The start and instruction word of player information screen
+     */
     public final String START_AND_INSTRUCTION_WORD;
+    /**
+     * The font size of player information screen
+     */
     public final int FONT_SIZE;
+    /**
+     * The y-coordinate of enter name word display in player information screen
+     */
     public final int ENTER_NAME_COOR_Y;
+    /**
+     * The y-coordinate of instructions word display in player information screen
+     */
     public final int INSTRUCTIONS_COOR_Y;
+    /**
+     * The y-coordinate of player name word display in player information screen
+     */
     public final int PLAYER_NAME_COOR_Y;
 
     private String name;
@@ -38,10 +61,18 @@ public class PlayerInfoScreen extends Screen{
 
     }
 
+    /**
+     * Gets the name of player information screen
+     * @return player information screen's name
+     */
     public String getName(){
         return name;
     }
 
+    /**
+     * Sets the name of player information screen
+     * @param name player information screen's name
+     */
     public void setName(String name) {
         this.name = name;
     }
@@ -82,7 +113,6 @@ public class PlayerInfoScreen extends Screen{
         }
 
         return res;
-
     }
 
     /**
@@ -100,7 +130,6 @@ public class PlayerInfoScreen extends Screen{
      * @param name String of player's name
      */
     public void displayName(String name){
-
         if (name.isEmpty()){
             return;
         }
