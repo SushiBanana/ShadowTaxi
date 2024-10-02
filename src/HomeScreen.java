@@ -7,12 +7,29 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public class HomeScreen extends Screen {
-
+    /**
+     * The title word of home screen
+     */
     public final String HOME_TITLE_WORD;
+    /**
+     * The instruction word of home screen
+     */
     public final String HOME_INSTRUCTION_WORD;
+    /**
+     * The title's font size of home screen
+     */
     public final int HOME_TITLE_FONT_SIZE;
+    /**
+     * The y-coordinate of title in home screen
+     */
     public final double TITLE_COOR_Y;
+    /**
+     * The instruction's font size of home screen
+     */
     public final int HOME_INSTRUCTION_FONT_SIZE;
+    /**
+     * The y-coordinate of instruction in home screen
+     */
     public final int INSTRUCTION_COOR_Y;
 
     /**

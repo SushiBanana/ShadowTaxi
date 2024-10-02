@@ -10,44 +10,153 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public class GamePlayScreen extends Screen{
-
+    /**
+     * The frame speed of game play screen
+     */
     public static final int FRAME_SPEED = 5;
+    /**
+     * The x-coordinate incrementation for display of passenger's priority gap in game play screen
+     */
     public static final int PRIORITY_GAP = 30;
+    /**
+     * The x-coordinate incrementation for display of passenger's earnings gap in game play screen
+     */
     public static final int EARNINGS_GAP = 100;
+    /**
+     * The maximum y-coordinate of game play screen's background
+     */
     public static final int FRAME_GREATER = 1152;
+    /**
+     * The number of lanes in game play screen
+     */
     public static final int NUM_LANES = 3;
+    /**
+     * The number of random y-coordinates for creating cars
+     */
     public static final int NUM_RANDOM_Y_COOR = 2;
-
-    public final Image BACKGROUND_RAIN; // new
+    /**
+     * The image of raining background in game play screen
+     */
+    public final Image BACKGROUND_RAIN;
+    /**
+     * The object file of game play screen
+     */
     public final String OBJECT_FILE;
-    public final String WEATHER_FILE; // new
+    /**
+     * The weather file of game play screen
+     */
+    public final String WEATHER_FILE;
+    /**
+     * The target score of game play screen
+     */
     public final double TARGET_SCORE;
+    /**
+     * The maximum number of frame in game play screen
+     */
     public final int MAX_FRAMES;
+    /**
+     * The display information font size of game play screen
+     */
     public final int INFO_FONT_SIZE;
+    /**
+     * The passenger display details font size
+     */
     public final int PASSENGER_FONT_SIZE;
+    /**
+     * The passenger earnings' x-coordinate display
+     */
     public final int EARNINGS_COOR_X;
+    /**
+     * The passenger earnings' y-coordinate display
+     */
     public final int EARNINGS_COOR_Y;
+    /**
+     * The target score's x-coordinate display
+     */
     public final int TARGET_COOR_X;
+    /**
+     * The target score's y-coordinate display
+     */
     public final int TARGET_COOR_Y;
+    /**
+     * The maximum frames x-coordinate display
+     */
     public final int MAX_FRAMES_COOR_X;
+    /**
+     * The maximum frames y-coordinate display
+     */
     public final int MAX_FRAMES_COOR_Y;
+    /**
+     * The passenger's health x-coordinate display
+     */
     public final int PASSENGER_HEALTH_COOR_X;
+    /**
+     * The passenger's health y-coordinate display
+     */
     public final int PASSENGER_HEALTH_COOR_Y;
+    /**
+     * The driver's health x-coordinate display
+     */
     public final int DRIVER_HEALTH_COOR_X;
+    /**
+     * The driver's health y-coordinate display
+     */
     public final int DRIVER_HEALTH_COOR_Y;
+    /**
+     * The taxi's health x-coordinate display
+     */
     public final int TAXI_HEALTH_COOR_X;
+    /**
+     * The taxi's health y-coordinate display
+     */
     public final int TAXI_HEALTH_COOR_Y;
+    /**
+     * The x-coordinates of first lane centre
+     */
     public final int LANE_CENTRE_1;
+    /**
+     * The x-coordinates of second lane centre
+     */
     public final int LANE_CENTRE_2;
+    /**
+     * The x-coordinates of third lane centre
+     */
     public final int LANE_CENTRE_3;
+    /**
+     * The game weather of game play screen
+     */
     public final String[][] GAME_WEATHER;
+    /**
+     * The taxi's maximum y-coordinate when spawning
+     */
     public final int TAXI_MAX_SPAWN_MAX_Y;
+    /**
+     * The taxi's minimum y-coordinate when spawning
+     */
     public final int TAXI_MAX_SPAWN_MIN_Y;
+    /**
+     * The pay word of game play screen
+     */
     public final String PAY_WORD;
+    /**
+     * The target word of game play screen
+     */
     public final String TARGET_WORD;
+    /**
+     * The frames remaining word of game play screen
+     */
     public final String FRAMES_REM_WORD;
+    /**
+     * The taxi health word of game play screen
+     */
     public final String TAXI_HEALTH_WORD;
+    /**
+     * The driver health word of game play screen
+     */
     public final String DRIVER_HEALTH_WORD;
+    /**
+     * The passenger health word of game play screen
+     */
     public final String PASSENGER_HEALTH_WORD;
 
     private int bottomCoorY;
@@ -120,72 +229,183 @@ public class GamePlayScreen extends Screen{
         this.cars = new ArrayList<>();
         this.isEjectedPassengerInTaxi = true;
 
-
         initialiseClasses(IOUtils.readCommaSeparatedFile(OBJECT_FILE));
     }
 
+    /**
+     * Gets the bottom screen's y-coordinate of game play screen
+     * @return game play screen's bottom screen's y-coordinate
+     */
     public int getBottomCoorY() {
         return bottomCoorY;
     }
 
+    /**
+     * Sets the bottom screen's y-coordinate of game play screen
+     * @param bottomCoorY game play screen's bottom screen's y-coordinate
+     */
     public void setBottomCoorY(int bottomCoorY) {
         this.bottomCoorY = bottomCoorY;
     }
 
+    /**
+     * Gets the top screen's y-coordinate of game play screen
+     * @return game play screen's top screen's y-coordinate
+     */
     public int getTopCoorY() {
         return topCoorY;
     }
 
+    /**
+     * Sets the top screen's y-coordinate of game play screen
+     * @param topCoorY game play screen's top screen's y-coordinate
+     */
     public void setTopCoorY(int topCoorY) {
         this.topCoorY = topCoorY;
     }
 
+    /**
+     * Gets the score of game play screen
+     * @return game play screen's score
+     */
     public double getScore() {
         return score;
     }
 
+    /**
+     * Sets the score of game play screen
+     * @param score game play screen's score
+     */
     public void setScore(double score) {
         this.score = score;
     }
 
+    /**
+     * Gets the frames left of game play screen
+     * @return game play screen's frame left
+     */
     public int getFrameLeft() {
         return frameLeft;
     }
 
+    /**
+     * Sets the frames left of game play screen
+     * @param frameLeft game play screen's frame left
+     */
     public void setFrameLeft(int frameLeft) {
         this.frameLeft = frameLeft;
     }
 
+    /**
+     * Gets the name of game play screen
+     * @return game play screen's name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the name of game play screen
+     * @param name game play screen's name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Gets whether a coin is active in game play screen
+     * @return true if active, false otherwise
+     */
     public boolean getIsCoinActive() {
         return isCoinActive;
     }
 
+    /**
+     * Sets whether a coin is active in game play screen
+     * @param coinActive true if active, false otherwise
+     */
     public void setIsCoinActive(boolean coinActive) {
         isCoinActive = coinActive;
     }
 
+    /**
+     * Gets the taxi of game play screen
+     * @return game play screen's taxi
+     */
     public Taxi getTaxi() {
         return taxi;
     }
 
+    /**
+     * Sets the taxi of game play screen
+     * @param taxi game play screen's taxi
+     */
     public void setTaxi(Taxi taxi) {
         this.taxi = taxi;
     }
 
+    /**
+     * Gets the driver of game play screen
+     * @return game play screen's driver
+     */
     public Driver getDriver() {
         return driver;
     }
 
+    /**
+     * Sets the driver of game play screen
+     * @param driver game play screen's driver
+     */
     public void setDriver(Driver driver) {
         this.driver = driver;
+    }
+
+    /**
+     * Gets whether is raining in game play screen
+     * @return true if raining, false otherwise
+     */
+    public boolean getIsRaining(){
+        return isRaining;
+    }
+
+    /**
+     * Sets whether is raining in game play screen
+     * @param isRaining true if raining, false otherwise
+     */
+    public void setIsRaining(boolean isRaining){
+        this.isRaining = isRaining;
+    }
+
+    /**
+     * Gets the damaged taxi of game play screen
+     * @return game play screen's damaged taxi
+     */
+    public Taxi getDamagedTaxi(){
+        return damagedTaxi;
+    }
+
+    /**
+     * Sets the damaged taxi of game play screen
+     * @param damagedTaxi game play screen's damaged taxi
+     */
+    public void setDamagedTaxi(Taxi damagedTaxi){
+        this.damagedTaxi = damagedTaxi;
+    }
+
+    /**
+     * Gets whether there is an ejected passenger in taxi of game play screen
+     * @return true if there is an ejected passenger in taxi, false otherwise
+     */
+    public boolean getIsEjectedPassengerInTaxi(){
+        return isEjectedPassengerInTaxi;
+    }
+
+    /**
+     * Sets whether there is an ejected passenger in taxi of game play screen
+     * @param isEjectedPassengerInTaxi true if there is an ejected passenger in taxi, false otherwise
+     */
+    public void setIsEjectedPassengerInTaxi(boolean isEjectedPassengerInTaxi){
+        this.isEjectedPassengerInTaxi = isEjectedPassengerInTaxi;
     }
 
     /**
@@ -917,6 +1137,7 @@ public class GamePlayScreen extends Screen{
 
     /**
      * Handles the collisions of different GameEntity with Invincible Powers
+     * @param invinciblePowers array of Invincible Power
      */
     public void collideInvinciblePowers(InvinciblePower[] invinciblePowers){
         for (InvinciblePower i: invinciblePowers){
