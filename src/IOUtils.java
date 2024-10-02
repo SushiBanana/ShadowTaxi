@@ -9,7 +9,7 @@ public class IOUtils {
     /***
      * Read a file and return a list of String arrays
      * @param file: the path to the CSV file
-     * @return: String[][]. Each String[] array represents elements in a single line in the CSV file
+     * @return String[][]: Each String[] array represents elements in a single line in the CSV file
      */
     public static String[][] readCommaSeparatedFile(String file) {
         try {
@@ -44,7 +44,7 @@ public class IOUtils {
     /***
      * Read a properties file and return a Properties object
      * @param configFile: the path to the properties file
-     * @return: Properties object
+     * @return Properties: object
      */
     public static Properties readPropertiesFile(String configFile) {
         Properties appProps = new Properties();

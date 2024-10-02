@@ -71,7 +71,7 @@ public abstract class Screen {
      * @param fontFile String of font file
      * @param textContent String of text content
      * @param fontSize integer of font size
-     * @param yCoor
+     * @param yCoor integer of y-coordinate
      */
     public void loadFont(String fontFile, String textContent, int fontSize, double yCoor){
         Font font = new Font(fontFile, fontSize);

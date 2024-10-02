@@ -180,6 +180,7 @@ public class ShadowTaxi extends AbstractGame {
 
     /**
      * Renders the home screen's display, if "ENTER" is pressed, Player Information Screen is set active
+     * @param input user's input
      */
     public void loadHomeScreen(Input input){
 

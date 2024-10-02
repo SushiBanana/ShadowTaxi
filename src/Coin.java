@@ -50,18 +50,34 @@ public class Coin extends GameEntity{
         this.currentFrame = 0;
     }
 
+    /**
+     * Gets whether coin is collided
+     * @return true if collided, false otherwise
+     */
     public boolean getIsCollided() {
         return isCollided;
     }
 
+    /**
+     * Sets whether coin is collided
+     * @param isCollided true if collided, false otherwise
+     */
     public void setIsCollided(boolean isCollided) {
         this.isCollided = isCollided;
     }
 
+    /**
+     * Gets the current frame of coin
+     * @return coin's current frame
+     */
     public int getCurrentFrame() {
         return currentFrame;
     }
 
+    /**
+     * Sets the current frame of coin
+     * @param currentFrame coin's current frame
+     */
     public void setCurrentFrame(int currentFrame) {
         this.currentFrame = currentFrame;
     }

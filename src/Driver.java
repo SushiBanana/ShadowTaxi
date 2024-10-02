@@ -248,6 +248,7 @@ public class Driver extends GameEntity implements Damageable{
 
     /**
      * Updates Driver's coordinates with Taxi when inside
+     * @param taxi Taxi object
      */
     public void moveWithTaxi(Taxi taxi) {
         setCoorX(getCoorX() - taxi.MOVE_FRAME_X);
