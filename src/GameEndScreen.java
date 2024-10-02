@@ -7,16 +7,45 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public class GameEndScreen extends Screen{
+    /**
+     * The number of top scores to display in game end screen
+     */
     public static final int NO_OF_TOP_SCORE = 5;
+    /**
+     * The y-coordinate incrementation of game end screen for display top scores
+     */
     public static final int GAME_END_INCREMENT_COOR = 40;
-
+    /**
+     * The score file of game end screen
+     */
     public final String SCORE_FILE;
+    /**
+     * The top 5 score word of game end screen
+     */
     public final String TOP_5_SCORES_WORD;
+    /**
+     * The win instruction word of game end screen
+     */
     public final String WIN_INSTRUCTION_WORD;
+    /**
+     * The lose instruction word of game end screen
+     */
     public final String LOSE_INSTRUCTION_WORD;
+    /**
+     * The status font size of game end screen
+     */
     public final int STATUS_FONT_SIZE;
+    /**
+     * The scores font size of game end screen
+     */
     public final int SCORES_FONT_SIZE;
+    /**
+     * The top 5 score y-coordinate of game end screen
+     */
     public final int TOP_5_SCORES_COOR_Y;
+    /**
+     * The game status y-coordinate of game end screen
+     */
     public final int STATUS_COOR_Y;
 
     /**

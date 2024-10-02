@@ -13,6 +13,7 @@ public class GamePlayScreen extends Screen{
 
     public static final int FRAME_SPEED = 5;
     public static final int PRIORITY_GAP = 30;
+    public static final int EARNINGS_GAP = 100;
     public static final int FRAME_GREATER = 1152;
     public static final int NUM_LANES = 3;
     public static final int NUM_RANDOM_Y_COOR = 2;
@@ -352,7 +353,6 @@ public class GamePlayScreen extends Screen{
                 p.BLOOD.incrementCurrentFrame();
             }
 
-
             movePassengerToFlag(p);
         }
 
@@ -368,8 +368,10 @@ public class GamePlayScreen extends Screen{
         }
 
         String priority = Integer.toString(p.getCurrentPriority());
+        String earnings = String.format("%.1f", p.getEarnings());
 
         loadFont(FONT_FILE, priority, PASSENGER_FONT_SIZE, p.getCoorX() - PRIORITY_GAP, p.getCoorY());
+        loadFont(FONT_FILE, earnings, PASSENGER_FONT_SIZE, p.getCoorX() - EARNINGS_GAP, p.getCoorY());
     }
 
     /**
@@ -524,9 +526,6 @@ public class GamePlayScreen extends Screen{
             currentTrip.decreasePassengerPriority();
             currentTrip.PASSENGER.calcExpEarnings(currentTrip.PASSENGER.getYDist());
 
-//            if (currentTrip.PASSENGER == taxi.getCurrentPassenger()) {
-//
-//            }
         }
     }
 
@@ -734,7 +733,6 @@ public class GamePlayScreen extends Screen{
                 }
                 break;
             }
-
 
         }
     }

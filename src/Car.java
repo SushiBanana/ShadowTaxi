@@ -5,7 +5,6 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public abstract class Car extends GameEntity implements Damageable, DamageDealer{
-
     /**
      * The collision timeout of car
      */

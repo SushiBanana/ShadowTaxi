@@ -5,7 +5,6 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public abstract class Effect extends GameEntity{
-
     /**
      * The taxi's vertical speed
      */

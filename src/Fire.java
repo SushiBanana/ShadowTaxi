@@ -6,7 +6,9 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public class Fire extends Effect{
-
+    /**
+     * The time to live of fire
+     */
     public final int TTL;
 
     /**

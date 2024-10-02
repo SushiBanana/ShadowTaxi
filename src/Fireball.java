@@ -6,12 +6,25 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public class Fireball extends GameEntity implements DamageDealer{
-
+    /**
+     * The divisibility of fireball
+     */
     public static final int DIVISIBILITY = 300;
-
+    /**
+     * The taxi's vertical speed
+     */
     public final int TAXI_MOVE_FRAME_Y;
+    /**
+     * The vertical speed of fireball
+     */
     public final int SHOOT_SPEED;
+    /**
+     * The radius of fireball
+     */
     public final double RADIUS;
+    /**
+     * The damage points of fireball
+     */
     public final int DAMAGE_POINTS;
 
     private boolean isActive;
@@ -34,10 +47,18 @@ public class Fireball extends GameEntity implements DamageDealer{
         this.isActive = true;
     }
 
+    /**
+     * Gets whether the fireball is active
+     * @return true if active, false otherwise
+     */
     public boolean getIsActive() {
         return isActive;
     }
 
+    /**
+     * Sets whether the fireball is active
+     * @param active true if active, false otherwise
+     */
     public void setIsActive(boolean active) {
         isActive = active;
     }

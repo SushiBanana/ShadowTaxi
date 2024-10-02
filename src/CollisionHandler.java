@@ -3,7 +3,6 @@
  * @author Alysha Thean Student ID: 1495768
  */
 public class CollisionHandler {
-
     /**
      * Checks collision between Taxi and Car
      * @param taxi Taxi object

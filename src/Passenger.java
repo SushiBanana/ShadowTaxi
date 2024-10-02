@@ -230,8 +230,6 @@ public class Passenger extends GameEntity implements Damageable{
         return flag;
     }
 
-
-
     /**
      * Increments one of passenger's x or y-coordinates towards their trip end flag based on WALK_SPEED_X and
      * WALK_SPEED_Y respectively
@@ -397,19 +395,21 @@ public class Passenger extends GameEntity implements Damageable{
     }
 
     /**
-     * Changes Passenger's priority when raining
+     * Changes Passenger's priority when raining and recalculates expected earnings
      */
     public void changePriorityWhenRaining(){
         if (!hasUmbrella){
             currentPriority = 1;
+            calcExpEarnings(yDist);
         }
     }
 
     /**
-     * Reverts Passenger's priority to original priority when no longer raining
+     * Reverts Passenger's priority to original priority when no longer raining and recalculates expected earnings
      */
     public void revertPriorityWhenSunny(){
         currentPriority = originalPriority;
+        calcExpEarnings(yDist);
     }
 
     /**

@@ -6,8 +6,13 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public abstract class GameEntity {
-
+    /**
+     * The game properties of game entity
+     */
     public final Properties GAME_PROPS;
+    /**
+     * The image of game entity
+     */
     public Image IMAGE;
 
     private int coorX;
@@ -25,18 +30,34 @@ public abstract class GameEntity {
         this.coorY = coorY;
     }
 
+    /**
+     * Gets the x-coordinate of game entity
+     * @return the game entity's x-coordinate
+     */
     public int getCoorX() {
         return coorX;
     }
 
+    /**
+     * Sets the x-coordinate of game entity
+     * @param coorX the game entity's x-coordinate
+     */
     public void setCoorX(int coorX) {
         this.coorX = coorX;
     }
 
+    /**
+     * Gets the y-coordinate of game entity
+     * @return the game entity's y-coordinate
+     */
     public int getCoorY() {
         return coorY;
     }
 
+    /**
+     * Sets the y-coordinate of game entity
+     * @param coorY the game entity's y-coordinate
+     */
     public void setCoorY(int coorY) {
         this.coorY = coorY;
     }

@@ -7,11 +7,17 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public class EnemyCar extends Car{
-
+    /**
+     * The divisibility of enemy car
+     */
     public final static int DIVISIBILITY = 400;
-
+    /**
+     * The taxi's vertical speed
+     */
     public final int TAXI_MOVE_FRAME_Y;
-    public final int SHOOT_SPEED_Y;
+    /**
+     * The damage points of enemy car
+     */
     public final double DAMAGE_POINTS;
 
     private ArrayList<Fireball> fireballs;
@@ -26,16 +32,23 @@ public class EnemyCar extends Car{
         super(gameProps, coorX, coorY);
         this.IMAGE = new Image(gameProps.getProperty("gameObjects.enemyCar.image"));
         this.TAXI_MOVE_FRAME_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.speedY"));
-        this.SHOOT_SPEED_Y = Integer.parseInt(gameProps.getProperty("gameObjects.fireball.shootSpeedY"));
         this.fireballs = new ArrayList<>();
         this.DAMAGE_POINTS = Double.parseDouble(gameProps.getProperty("gameObjects.fireball.damage"));
 
     }
 
+    /**
+     * Gets the fireballs of enemy car
+     * @return the enemy car's fireballs
+     */
     public ArrayList<Fireball> getFireballs() {
         return fireballs;
     }
 
+    /**
+     * Sets the fireballs of enemy car
+     * @param fireballs the enemy car's fireballs
+     */
     public void setFireballs(ArrayList<Fireball> fireballs) {
         this.fireballs = fireballs;
     }
