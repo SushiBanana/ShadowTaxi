@@ -6,19 +6,57 @@ import java.util.Properties;
  */
 public abstract class Car extends GameEntity implements Damageable, DamageDealer{
 
+    /**
+     * The collision timeout of car
+     */
     public final static int COLLISION_TIMEOUT = 200;
+    /**
+     * The first random y-coordinate of car
+     */
     public final static int CAR_COOR_Y_RAND_1 = -50;
+    /**
+     * The second random y-coordinate of car
+     */
     public final static int CAR_COOR_Y_RAND_2 = 768;
+    /**
+     * The momentum frames of car
+     */
     public final static int MOMENTUM = 10;
+    /**
+     * The movement step of car's y-coordinate
+     */
     public final static int COOR_Y_MOVEMENT_STEP = 1;
-
+    /**
+     * The minimum vertical speed of car
+     */
     public final int MIN_SPEED_Y;
+    /**
+     * The maximum vertical speed of car
+     */
     public final int MAX_SPEED_Y;
+    /**
+     * The radius of car
+     */
     public final double RADIUS;
+    /**
+     * The damage points of car
+     */
     public final double DAMAGE_POINTS;
+    /**
+     * The number of car types
+     */
     public final int NUM_TYPES;
+    /**
+     * The taxi's vertical speed
+     */
     public final int TAXI_MOVE_FRAME_Y;
+    /**
+     * The fire of car
+     */
     public Fire FIRE;
+    /**
+     * The smoke of car
+     */
     public Smoke SMOKE;
 
     private int moveFrame;
@@ -30,8 +68,8 @@ public abstract class Car extends GameEntity implements Damageable, DamageDealer
     /**
      * Constructor for Car class
      * @param gameProps properties file for values of various attributes
-     * @param coorX x-coordinate of Car
-     * @param coorY y-coordinate of Car
+     * @param coorX x-coordinate of car
+     * @param coorY y-coordinate of car
      */
     public Car (Properties gameProps, int coorX, int coorY){
         super(gameProps, coorX, coorY);
@@ -50,42 +88,82 @@ public abstract class Car extends GameEntity implements Damageable, DamageDealer
 
     }
 
+    /**
+     * Gets the health of car
+     * @return the car's health
+     */
     public double getHealth() {
         return health;
     }
 
+    /**
+     * Sets the health of car
+     * @param health the car's health
+     */
     public void setHealth(double health) {
         this.health = health;
     }
 
+    /**
+     * Gets whether the car is active
+     * @return true if active, false otherwise
+     */
     public boolean getIsActive() {
         return isActive;
     }
 
+    /**
+     * Sets whether the car is active
+     * @param active true if active, false otherwise
+     */
     public void setIsActive(boolean active) {
         isActive = active;
     }
 
+    /**
+     * Gets the car's current momentum frame
+     * @return the car's current momentum frame
+     */
     public int getMomentumCurrentFrame() {
         return momentumCurrentFrame;
     }
 
+    /**
+     * Gets the car's current momentum frame
+     * @param momentumCurrentFrame the car's current momentum frame
+     */
     public void setMomentumCurrentFrame(int momentumCurrentFrame) {
         this.momentumCurrentFrame = momentumCurrentFrame;
     }
 
+    /**
+     * Gets the car's collision timeout remaining
+     * @return the car's collision timeout remaining
+     */
     public int getCollisionTimeoutLeft() {
         return collisionTimeoutLeft;
     }
 
+    /**
+     * Sets the car's collision timeout remaining
+     * @param collisionTimeoutLeft the car's collision timeout remaining
+     */
     public void setCollisionTimeoutLeft(int collisionTimeoutLeft) {
         this.collisionTimeoutLeft = collisionTimeoutLeft;
     }
 
+    /**
+     * Gets the car's move frame
+     * @return the car's move frame
+     */
     public int getMoveFrame() {
         return moveFrame;
     }
 
+    /**
+     * Sets the car's move frame
+     * @param moveFrame the car's move frame
+     */
     public void setMoveFrame(int moveFrame) {
         this.moveFrame = moveFrame;
     }

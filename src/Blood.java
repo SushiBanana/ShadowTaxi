@@ -7,13 +7,16 @@ import java.util.Properties;
  */
 public class Blood extends Effect{
 
+    /**
+     * The time to live of blood
+     */
     public final int TTL;
 
     /**
      * Constructor for Blood class
      * @param gameProps properties file for values of various attributes
-     * @param coorX x-coordinate of Blood
-     * @param coorY y-coordinate of Blood
+     * @param coorX x-coordinate of blood
+     * @param coorY y-coordinate of blood
      */
     public Blood(Properties gameProps, int coorX, int coorY){
         super(gameProps, coorX, coorY);
@@ -22,7 +25,7 @@ public class Blood extends Effect{
     }
 
     /**
-     * Increments current frame of Blood until it reaches its Time To Live
+     * Increments current frame of blood until it reaches Time To Live
      */
     public void incrementCurrentFrame(){
         if (getCurrentFrame() == TTL){
@@ -34,8 +37,8 @@ public class Blood extends Effect{
     }
 
     /**
-     * Return the state of Blood object
-     * @return String of states of Blood object
+     * Return the state of blood object
+     * @return String of states of blood object
      */
     public String toString(){
         return "Blood\n_________" +
