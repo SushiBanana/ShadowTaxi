@@ -7,6 +7,9 @@ import java.util.Properties;
  */
 public class OtherCar extends Car{
 
+    /**
+     * The divisibility of other car
+     */
     public final static int DIVISIBILITY = 200;
 
     /**

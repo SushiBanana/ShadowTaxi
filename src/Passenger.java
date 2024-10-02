@@ -6,23 +6,69 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public class Passenger extends GameEntity implements Damageable{
-
+    /**
+     * The x-coordinate offset of passenger's ejection
+     */
     public final static int EJECTION_COOR_X_MINUS = 100;
+    /**
+     * The momentum frames of passenger
+     */
     public static final int MOMENTUM = 10;
+    /**
+     * The movement step of passenger's y-coordinate
+     */
     public final static int COOR_Y_MOVEMENT_STEP = 2;
+    /**
+     * The collision timeout of passenger
+     */
     public final static int COLLISION_TIMEOUT = 200;
-
+    /**
+     * The taxi's vertical speed
+     */
     public final int TAXI_MOVE_FRAME_Y;
+    /**
+     * The trip end flag of passenger
+     */
     public final TripEndFlag TRIP_END_FLAG;
+    /**
+     * The distance between passenger and another entity to be considered "adjacent"
+     */
     public final int ADJACENT_DIST;
+    /**
+     * The horizontal walking speed of passenger
+     */
     public final int WALK_SPEED_X;
+    /**
+     * The vertical walking speed of passenger
+     */
     public final int WALK_SPEED_Y;
+    /**
+     * The passenger's rate per each y-coordinate travelled
+     */
     public final double RATE_PER_Y;
+    /**
+     * The rate of priority 1 of passenger
+     */
     public final int RATE_PRIORITY_1;
+    /**
+     * The rate of priority 2 of passenger
+     */
     public final int RATE_PRIORITY_2;
+    /**
+     * The rate of priority 3 of passenger
+     */
     public final int RATE_PRIORITY_3;
+    /**
+     * The blood of passenger
+     */
     public final Blood BLOOD;
+    /**
+     * The radius of passenger
+     */
     public final int RADIUS;
+    /**
+     * The taxi get in radius of passenger
+     */
     public final int TAXI_GET_IN_RADIUS;
 
     private int currentPriority;
@@ -46,6 +92,7 @@ public class Passenger extends GameEntity implements Damageable{
      * @param priority integer of passenger priority
      * @param endCoorX integer of passenger end x-coordinate
      * @param yDist integer of distance travelled vertically during trip
+     * @param hasUmbrella boolean of whether passenger has umbrella
      */
     public Passenger(Properties gameProps, int coorX, int coorY, int priority, int endCoorX, int yDist,
                      boolean hasUmbrella){
@@ -77,90 +124,194 @@ public class Passenger extends GameEntity implements Damageable{
 
     }
 
+    /**
+     * Gets the current priority of passenger
+     * @return passenger's current priority
+     */
     public int getCurrentPriority() {
         return currentPriority;
     }
 
+    /**
+     * Sets the current priority of passenger
+     * @param currentPriority passenger's current priority
+     */
     public void setCurrentPriority(int currentPriority) {
         this.currentPriority = currentPriority;
     }
 
+    /**
+     * Gets the original priority of passenger
+     * @return passenger's original priority
+     */
+    public int getOriginalPriority() {
+        return originalPriority;
+    }
+
+    /**
+     * Sets the original priority of passenger
+     * @param originalPriority passenger's original priority
+     */
+    public void setOriginalPriority(int originalPriority) {
+        this.originalPriority = originalPriority;
+    }
+
+    /**
+     * Gets whether the passenger is picked up
+     * @return true if picked up, false otherwise
+     */
     public boolean getIsPickedUp(){
         return isPickedUp;
     }
 
+    /**
+     * Sets whether the passenger if picked up
+     * @param isPickedUp true if picked up, false otherwise
+     */
     public void setIsPickedUp(boolean isPickedUp){
         this.isPickedUp = isPickedUp;
     }
 
+    /**
+     * Gets the earnings of passenger
+     * @return passenger's earnings
+     */
     public double getEarnings() {
         return earnings;
     }
 
+    /**
+     * Sets the earnings of passenger
+     * @param earnings passenger's earnings
+     */
     public void setEarnings(double earnings) {
         this.earnings = earnings;
     }
 
+    /**
+     * Gets the vertical distance to travel by passenger
+     * @return passenger's vertical distance to travel
+     */
     public int getYDist() {
         return yDist;
     }
 
+    /**
+     * Sets the vertical distance to travel by passenger
+     * @param yDist passenger's vertical distance to travel
+     */
     public void setYDist(int yDist) {
         this.yDist = yDist;
     }
 
+    /**
+     * Gets the end of the trip x-coordinate of passenger
+     * @return passenger's end of the trip x-coordinate
+     */
     public int getEndCoorX() {
         return endCoorX;
     }
 
+    /**
+     * Sets the end of the trip x-coordinate of passenger
+     * @param endCoorX passenger's end of the trip x-coordinate
+     */
     public void setEndCoorX(int endCoorX) {
         this.endCoorX = endCoorX;
     }
 
+    /**
+     * Gets whether the passenger has an umbrella
+     * @return true if passenger has umbrella, false otherwise
+     */
     public boolean getHasUmbrella() {
         return hasUmbrella;
     }
 
+    /**
+     * Sets whether the passenger has an umbrella
+     * @param hasUmbrella true if passenger has umbrella, false otherwise
+     */
     public void setHasUmbrella(boolean hasUmbrella) {
         this.hasUmbrella = hasUmbrella;
     }
 
+    /**
+     * Gets the health of passenger
+     * @return passenger's health
+     */
     public double getHealth() {
         return health;
     }
 
+    /**
+     * Sets the health of passenger
+     * @param health passenger's health
+     */
     public void setHealth(double health) {
         this.health = health;
     }
 
+    /**
+     * Gets whether the passenger is dropped off
+     * @return true if passenger is dropped off, false otherwise
+     */
     public boolean isDroppedOff() {
         return isDroppedOff;
     }
 
+    /**
+     * Sets whether the passenger is dropped off
+     * @param isDroppedOff true if passenger is dropped off, false otherwise
+     */
     public void setIsDroppedOff(boolean isDroppedOff) {
         this.isDroppedOff = isDroppedOff;
     }
 
+    /**
+     * Gets whether the passenger is ejected from taxi
+     * @return true if passenger is ejected, false otherwise
+     */
     public boolean getIsEjected() {
         return isEjected;
     }
 
+    /**
+     * Sets whether the passenger is ejected from taxi
+     * @param isEjected true if passenger is ejected, false otherwise
+     */
     public void setIsEjected(boolean isEjected) {
         this.isEjected = isEjected;
     }
 
+    /**
+     * Gets the collision timeout remaining of passenger
+     * @return passenger's collision timeout remaining
+     */
     public int getCollisionTimeoutLeft() {
         return collisionTimeoutLeft;
     }
 
+    /**
+     * Sets the collision timeout remaining of passenger
+     * @param collisionTimeoutLeft passenger's collision timeout remaining
+     */
     public void setCollisionTimeoutLeft(int collisionTimeoutLeft) {
         this.collisionTimeoutLeft = collisionTimeoutLeft;
     }
 
+    /**
+     * Gets the current momentum frame of passenger
+     * @return passenger's current momentum frame
+     */
     public int getMomentumCurrentFrame() {
         return momentumCurrentFrame;
     }
 
+    /**
+     * Sets the current momentum frame of passenger
+     * @param momentumCurrentFrame passenger's current momentum frame
+     */
     public void setMomentumCurrentFrame(int momentumCurrentFrame) {
         this.momentumCurrentFrame = momentumCurrentFrame;
     }

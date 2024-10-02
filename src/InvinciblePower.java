@@ -6,8 +6,17 @@ import java.util.Properties;
  * @author Alysha Thean Student ID: 1495768
  */
 public class InvinciblePower extends GameEntity{
+    /**
+     * The taxi's vertical speed
+     */
     public final int TAXI_MOVE_FRAME_Y;
+    /**
+     * The radius of invincible power
+     */
     public final double RADIUS;
+    /**
+     * The maximum frames of invincible power
+     */
     public final int MAX_FRAMES;
 
     private boolean isCollided;
@@ -30,18 +39,34 @@ public class InvinciblePower extends GameEntity{
         this.frameLeft = 0;
     }
 
+    /**
+     * Gets whether invincible power is collided
+     * @return true if collided, false otherwise
+     */
     public boolean getIsCollided() {
         return isCollided;
     }
 
+    /**
+     * Sets whether invincible power is collided
+     * @param collided true if collided, false otherwise
+     */
     public void setIsCollided(boolean collided) {
         isCollided = collided;
     }
 
+    /**
+     * Gets frames left of invincible power
+     * @return invincible power's frame left
+     */
     public int getFrameLeft() {
         return frameLeft;
     }
 
+    /**
+     * Sets frames left of invincible power
+     * @param frameLeft invincible power's frame left
+     */
     public void setFrameLeft(int frameLeft) {
         this.frameLeft = frameLeft;
     }
