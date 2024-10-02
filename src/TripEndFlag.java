@@ -7,7 +7,13 @@ import java.util.Properties;
  */
 public class TripEndFlag extends GameEntity{
 
+    /**
+     * The taxi's vertical movement speed
+     */
     public final int TAXI_MOVE_FRAME_Y;
+    /**
+     * The radius of trip end flag
+     */
     public final int RADIUS;
 
     private boolean isVisible;
@@ -27,10 +33,18 @@ public class TripEndFlag extends GameEntity{
         this.isVisible = false;
     }
 
+    /**
+     * Gets whether the trip end flag is visible
+     * @return true if visible, false otherwise
+     */
     public boolean getIsVisible() {
         return isVisible;
     }
 
+    /**
+     * Sets whether the trip end flag is visible
+     * @param isVisible true if visible, false otherwise
+     */
     public void setIsVisible(boolean isVisible) {
         this.isVisible = isVisible;
     }

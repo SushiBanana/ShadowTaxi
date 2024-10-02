@@ -8,19 +8,57 @@ import java.util.Properties;
  */
 public class Taxi extends GameEntity implements Damageable, DamageDealer{
 
+    /**
+     * The collision timeout of taxi
+     */
     public final static int COLLISION_TIMEOUT = 200;
+    /**
+     * The momentum frames of taxi
+     */
     public final static int MOMENTUM = 10;
+    /**
+     * The movement step of taxi's y-coordinate
+     */
     public final static int COOR_Y_MOVEMENT_STEP = 1;
-
+    /**
+     * The radius of taxi
+     */
     public final double RADIUS;
+    /**
+     * The horizontal moving speed of taxi
+     */
     public final int MOVE_FRAME_X;
-    public final Image UNDAMAGED_IMAGE;
-    public final Image DAMAGED_IMAGE;
-    public final double DAMAGE_POINTS;
-    public final int SPAWN_MIN_Y;
-    public final int SPAWN_MAX_Y;
+    /**
+     * The vertical moving speed of taxi
+     */
     public final int MOVE_FRAME_Y;
+    /**
+     * The image of undamaged taxi
+     */
+    public final Image UNDAMAGED_IMAGE;
+    /**
+     * The image of damaged taxi
+     */
+    public final Image DAMAGED_IMAGE;
+    /**
+     * The damage points of taxi
+     */
+    public final double DAMAGE_POINTS;
+    /**
+     * The minimum y-coordinate of taxi's new spawn
+     */
+    public final int SPAWN_MIN_Y;
+    /**
+     * The maximum y-coordinate of taxi's new spawn
+     */
+    public final int SPAWN_MAX_Y;
+    /**
+     * The smoke of taxi
+     */
     public Smoke SMOKE;
+    /**
+     * The fire of taxi
+     */
     public Fire FIRE;
 
     private Passenger currentPassenger;
@@ -34,8 +72,9 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
     /**
      * Constructor for Taxi class
      * @param gameProps properties file for values of various attributes
-     * @param coorX x-coordinate of Taxi
-     * @param coorY y-coordinate of Taxi
+     * @param coorX integer of taxi's x-coordinate
+     * @param coorY integer of taxi's y-coordinate
+     * @param isDamaged boolean of whether taxi is damaged
      */
     public Taxi(Properties gameProps, int coorX, int coorY, boolean isDamaged){
         super(gameProps, coorX, coorY);
@@ -60,58 +99,114 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
         this.invinciblePower = new InvinciblePower(gameProps, coorX, coorY);
     }
 
+    /**
+     * Gets the current passenger of taxi
+     * @return taxi's current passenger
+     */
     public Passenger getCurrentPassenger() {
         return currentPassenger;
     }
 
+    /**
+     * sets the current passenger of taxi
+     * @param currentPassenger tax's current passenger
+     */
     public void setCurrentPassenger(Passenger currentPassenger) {
         this.currentPassenger = currentPassenger;
     }
 
+    /**
+     * Gets the health of taxi
+     * @return taxi's health
+     */
     public double getHealth() {
         return health;
     }
 
+    /**
+     * Sets the health of taxi
+     * @param health taxi's health
+     */
     public void setHealth(double health) {
         this.health = health;
     }
 
+    /**
+     * Gets whether the taxi is permanently damaged
+     * @return true if taxi is permanently damaged, false otherwise
+     */
     public boolean getIsDamaged(){
         return isDamaged;
     }
 
+    /**
+     * Sets whether the taxi is permanently damaged
+     * @param isDamaged ture if taxi is permanently damaged, false otherwise
+     */
     public void setIsDamaged(boolean isDamaged){
         this.isDamaged = isDamaged;
     }
 
+    /**
+     * Gets whether the taxis has a driver
+     * @return true if taxi has a driver, false otherwise
+     */
     public boolean getHasDriver(){
         return hasDriver;
     }
 
+    /**
+     * Sets whether the taxi has a driver
+     * @param hasDriver true if taxi has a driver, false otherwise
+     */
     public void setHasDriver(boolean hasDriver){
         this.hasDriver = hasDriver;
     }
 
+    /**
+     * Gets the collision timeout remaining of taxi
+     * @return taxi's collision timeout remaining
+     */
     public int getCollisionTimeoutLeft() {
         return collisionTimeoutLeft;
     }
 
+    /**
+     * Sets the collision timeout remaining of taxi
+     * @param collisionTimeoutLeft taxi's collision timeout remaining
+     */
     public void setCollisionTimeoutLeft(int collisionTimeoutLeft) {
         this.collisionTimeoutLeft = collisionTimeoutLeft;
     }
 
+    /**
+     * Gets the current momentum frame of taxi
+     * @return taxi's current momentum frame
+     */
     public int getMomentumCurrentFrame() {
         return momentumCurrentFrame;
     }
 
+    /**
+     * Sets the current momentum frame of taxi
+     * @param momentumCurrentFrame taxi's current momentum frame
+     */
     public void setMomentumCurrentFrame(int momentumCurrentFrame) {
         this.momentumCurrentFrame = momentumCurrentFrame;
     }
 
+    /**
+     * Gets the invincible power of taxi
+     * @return taxi's invincible power
+     */
     public InvinciblePower getInvinciblePower() {
         return invinciblePower;
     }
 
+    /**
+     * Sets the invicible power of taxi
+     * @param invinciblePower taxi's invincible power
+     */
     public void setInvinciblePower(InvinciblePower invinciblePower) {
         this.invinciblePower = invinciblePower;
     }
@@ -202,7 +297,6 @@ public class Taxi extends GameEntity implements Damageable, DamageDealer{
             collisionTimeoutLeft = COLLISION_TIMEOUT;
             checkIfPermanentlyDamaged();
         }
-
     }
 
     /**
