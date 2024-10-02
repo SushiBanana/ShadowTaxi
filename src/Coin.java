@@ -7,10 +7,25 @@ import java.util.Properties;
  */
 public class Coin extends GameEntity{
 
+    /**
+     * The taxi's vertical speed
+     */
     public final int TAXI_MOVE_FRAME_Y;
+    /**
+     * The x-coordinate of coin's display
+     */
     public final int DISPLAY_FRAME_COOR_X;
+    /**
+     * The y-coordinate of coin's display
+     */
     public final int DISPLAY_FRAME_COOR_Y;
+    /**
+     * The radius of coin
+     */
     public final double RADIUS;
+    /**
+     * The maximum frames of coin
+     */
     public final int MAX_FRAMES;
 
     private boolean isCollided;
@@ -27,7 +42,6 @@ public class Coin extends GameEntity{
 
         this.IMAGE = new Image(gameProps.getProperty("gameObjects.coin.image"));
         this.TAXI_MOVE_FRAME_Y = Integer.parseInt(gameProps.getProperty("gameObjects.taxi.speedY"));
-
         this.DISPLAY_FRAME_COOR_X = Integer.parseInt(gameProps.getProperty("gameplay.coin.x"));
         this.DISPLAY_FRAME_COOR_Y = Integer.parseInt(gameProps.getProperty("gameplay.coin.y"));
         this.RADIUS = Double.parseDouble(gameProps.getProperty("gameObjects.coin.radius"));

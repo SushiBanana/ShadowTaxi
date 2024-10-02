@@ -7,20 +7,46 @@ import java.util.Properties;
  */
 public class Driver extends GameEntity implements Damageable{
 
+    /**
+     * The driver's ejection x-coordinate offset
+     */
     public final static int EJECTION_COOR_X_MINUS = 50;
+    /**
+     * The momentum frames of driver
+     */
     public final static int MOMENTUM = 10;
+    /**
+     * The collision timeout of driver
+     */
     public final static int COLLISION_TIMEOUT = 200;
+    /**
+     * The movement step of driver's y-coordinate
+     */
     public final static int COOR_Y_MOVEMENT_STEP = 2;
-
+    /**
+     * The horizontal walking speed of driver
+     */
     public final int WALK_SPEED_X;
+    /**
+     * The vertical walking speed of driver
+     */
     public final int WALK_SPEED_Y;
+    /**
+     * The radius of driver
+     */
     public final int RADIUS;
+    /**
+     * The driver's taxi get in radius
+     */
     public final int TAXI_GET_IN_RADIUS;
+    /**
+     * The blood of driver
+     */
+    public final Blood BLOOD;
 
     private double health;
     private int collisionTimeoutLeft;
     private boolean isEjected;
-    public final Blood BLOOD;
     private int momentumCurrentFrame;
     private InvinciblePower invinciblePower;
 
@@ -45,42 +71,82 @@ public class Driver extends GameEntity implements Damageable{
         this.invinciblePower = new InvinciblePower(gameProps, coorX, coorY);
     }
 
+    /**
+     * Gets the health of driver
+     * @return the driver's health
+     */
     public double getHealth() {
         return health;
     }
 
+    /**
+     * Sets the health of driver
+     * @param health the driver's health
+     */
     public void setHealth(double health) {
         this.health = health;
     }
 
+    /**
+     * Gets whether the driver is ejected
+     * @return true if ejected, false otherwise
+     */
     public boolean getIsEjected() {
         return isEjected;
     }
 
+    /**
+     * Sets whether the driver is ejected
+     * @param ejected true if ejected, false otherwise
+     */
     public void setIsEjected(boolean ejected) {
         isEjected = ejected;
     }
 
+    /**
+     * Gets the invincible power of driver
+     * @return the driver's invincible power
+     */
     public InvinciblePower getInvinciblePower() {
         return invinciblePower;
     }
 
+    /**
+     * Sets the invincible power of driver
+     * @param invinciblePower the driver's invincible power
+     */
     public void setInvinciblePower(InvinciblePower invinciblePower) {
         this.invinciblePower = invinciblePower;
     }
 
+    /**
+     * Gets the collision timeout remaining of driver
+     * @return the driver's collision timeout remaining
+     */
     public int getCollisionTimeoutLeft() {
         return collisionTimeoutLeft;
     }
 
+    /**
+     * Sets the collision timeout remaining of driver
+     * @param collisionTimeoutLeft the driver's collision timeout remaining
+     */
     public void setCollisionTimeoutLeft(int collisionTimeoutLeft) {
         this.collisionTimeoutLeft = collisionTimeoutLeft;
     }
 
+    /**
+     * Gets the momentum current frame of driver
+     * @return the driver's current momentum frame
+     */
     public int getMomentumCurrentFrame() {
         return momentumCurrentFrame;
     }
 
+    /**
+     * Sets the momentum current frame of driver
+     * @param momentumCurrentFrame the driver's current momentum frame
+     */
     public void setMomentumCurrentFrame(int momentumCurrentFrame) {
         this.momentumCurrentFrame = momentumCurrentFrame;
     }
