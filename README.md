@@ -7,4 +7,5 @@ Welcome to **ShadowTaxi** - a fast-paced taxi simulation game in a world of endl
 - **Dodge and Survive**: Avoid collisions with other cars and enemy vehicles that could end your journey prematurely.
 - **Collect Power-ups**: Increase your score by collecting coins, gaining invincibility, and raising passenger priority.
 - **Dynamic Challenges**: Adjust your strategy with changing weather conditions and new obstacles on the road.
-![image](https://github.com/user-attachments/assets/136120d0-03a6-4d2c-ab36-4dd6030772f6)
+![image](https://github.com/user-attachments/assets/c9211990-7ab2-49de-ae04-4ed3fd773054)
+
